@@ -1,0 +1,6 @@
+{
+  "name": "EldeVar",
+  "description": "Eski hikâyeler yeni sahibiyle canlanıyor - Eşyaların yaşam izi ve hafıza pasaportuyla buluştuğu C2C ikinci el pazaryeri",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
