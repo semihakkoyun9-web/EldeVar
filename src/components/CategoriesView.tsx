@@ -92,7 +92,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
   const activeSubtags = categorySubtags[standardFilters.category] || categorySubtags.all;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 pb-24 space-y-6">
+    <div className="max-w-7xl mx-auto px-3.5 sm:px-6 py-4 sm:py-6 pb-28 sm:pb-16 space-y-4 sm:space-y-6">
       {/* Breadcrumb Navigation & Top Summary */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E8E2D8]">
         <div className="flex items-center gap-2 text-xs text-stone-500 font-sans flex-wrap">
@@ -138,7 +138,14 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
             className="flex-1 py-2 px-3.5 bg-white border border-[#DFCBB6] text-stone-800 font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
           >
             <SlidersHorizontal className="w-3.5 h-3.5 text-[#9E4424]" />
-            <span>Filtreleri Düzenle</span>
+            <span>Tüm Filtreleri Düzenle</span>
+          </button>
+
+          <button
+            onClick={onResetFilters}
+            className="py-2 px-3 bg-[#FAF8F5] border border-[#E5DDD1] text-stone-600 font-semibold rounded-xl text-xs cursor-pointer active:scale-95"
+          >
+            Sıfırla
           </button>
         </div>
       </div>
@@ -162,29 +169,54 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
         </div>
 
         {/* SAĞ ÜRÜN VE LİSTELEME ALANI */}
-        <main className="flex-1 min-w-0 space-y-5">
+        <main className="flex-1 min-w-0 space-y-4 sm:space-y-5">
           {/* Header Row: Title, Subtags, and Results Count */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-xl sm:text-2xl font-serif font-black text-stone-900 tracking-tight">
+                <h1 className="text-lg sm:text-2xl font-serif font-black text-stone-900 tracking-tight">
                   {getCategoryTitle()}
                 </h1>
-                <p className="text-xs text-stone-500 font-sans mt-0.5">
-                  Önceki sahibinin hatırasıyla gelen, doğrulanmış ve döngüsel parçalar
+                <p className="text-[11px] sm:text-xs text-stone-500 font-sans mt-0.5">
+                  Önceki sahibinin hatırasıyla gelen, doğrulanmış parçalar
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white border border-[#E2DBD0] text-stone-700 shadow-2xs">
-                  {filteredProducts.length} Ürün Listelendi
+                <span className="text-[11px] sm:text-xs font-semibold px-2.5 py-1 rounded-full bg-white border border-[#E2DBD0] text-stone-700 shadow-2xs whitespace-nowrap">
+                  {filteredProducts.length} Ürün
                 </span>
               </div>
             </div>
 
+            {/* Mobile Quick Condition Filter Pills */}
+            <div className="flex lg:hidden items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+              {[
+                { id: 'all', label: 'Tüm Kondisyonlar' },
+                { id: 'yeni_gibi', label: 'Kusursuz' },
+                { id: 'az_kullanilmis', label: 'Az Kullanılmış' },
+                { id: 'vintage', label: 'Vintage' },
+              ].map((tab) => {
+                const isSelected = selectedCondition === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => onSelectCondition(tab.id as ConditionKey | 'all')}
+                    className={`px-3 py-1 rounded-full text-[11px] whitespace-nowrap cursor-pointer transition-all ${
+                      isSelected
+                        ? 'bg-stone-900 text-white font-bold shadow-xs'
+                        : 'bg-white text-stone-700 border border-[#E5DDD1] active:bg-stone-50'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+
             {/* Quick subcategory tags */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-              <span className="text-[11px] font-semibold text-stone-500 shrink-0">Popüler Etiketler:</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 no-scrollbar">
+              <span className="text-[10px] sm:text-[11px] font-semibold text-stone-400 shrink-0">Etiketler:</span>
               {activeSubtags.map((tag, idx) => {
                 const isActive = searchQuery.toLowerCase() === tag.toLowerCase();
                 return (
@@ -195,7 +227,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                         onSearchChange(isActive ? '' : tag);
                       }
                     }}
-                    className={`px-3 py-1 rounded-full text-xs border transition-all whitespace-nowrap shadow-2xs cursor-pointer ${
+                    className={`px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs border transition-all whitespace-nowrap shadow-2xs cursor-pointer ${
                       isActive
                         ? 'bg-[#9E4424] text-white border-[#9E4424] font-bold shadow-xs'
                         : 'bg-white hover:bg-stone-50 text-stone-700 border-[#E5DDD1] hover:border-[#9E4424] hover:text-[#9E4424]'
@@ -228,7 +260,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-4 sm:gap-5">
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-2.5 sm:gap-5">
               {filteredProducts.map((product) => (
                 <ProductCard
                   key={product.id}

@@ -39,7 +39,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 pb-28">
+    <div className="max-w-7xl mx-auto px-3.5 sm:px-4 py-4 sm:py-6 pb-32 sm:pb-28">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-xl font-bold text-stone-900 flex items-center gap-2">
@@ -54,7 +54,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {favoriteProducts.map((prod) => (
           <ProductCard
             key={prod.id}

@@ -29,11 +29,13 @@ export const StoryPassportViewer: React.FC<StoryPassportViewerProps> = ({
   const conditionTheme = CONDITION_THEMES[conditionKey];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#1C1917]/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-[#FAF8F5] w-full max-w-2xl rounded-3xl shadow-2xl border border-[#E4D8C4] overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 bg-[#1C1917]/75 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
+      <div className="bg-[#FAF8F5] w-full max-w-2xl rounded-t-3xl sm:rounded-3xl shadow-2xl border border-[#E4D8C4] overflow-hidden max-h-[94vh] sm:max-h-[90vh] flex flex-col relative animate-in fade-in slide-in-from-bottom-8 sm:zoom-in-95 duration-200">
+        {/* Mobile Pull Indicator */}
+        <div className="w-10 h-1 bg-stone-500/40 rounded-full mx-auto mt-2 sm:hidden shrink-0" />
         
         {/* Header Ribbon: Passport Header */}
-        <div className="bg-gradient-to-r from-[#2A241F] via-[#382F28] to-[#2A241F] text-[#F5EDE1] px-5 py-4 flex items-center justify-between border-b border-[#4A3F35]">
+        <div className="bg-gradient-to-r from-[#2A241F] via-[#382F28] to-[#2A241F] text-[#F5EDE1] px-4 sm:px-5 py-3.5 sm:py-4 flex items-center justify-between border-b border-[#4A3F35] shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-[#9E4424] text-white flex items-center justify-center font-serif font-bold text-lg shadow-sm border border-[#C2623F]">
               EV

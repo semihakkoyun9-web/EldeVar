@@ -137,10 +137,13 @@ export const SellerAddProductModal: React.FC<SellerAddProductModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#1C1917]/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-[#FAF8F5] w-full max-w-2xl rounded-2xl shadow-2xl border border-[#E8E2D8] overflow-hidden my-auto max-h-[92vh] flex flex-col relative animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 bg-[#1C1917]/70 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
+      <div className="bg-[#FAF8F5] w-full max-w-2xl rounded-t-3xl sm:rounded-2xl shadow-2xl border border-[#E8E2D8] overflow-hidden max-h-[94vh] sm:max-h-[92vh] flex flex-col relative animate-in fade-in slide-in-from-bottom-8 sm:zoom-in-95 duration-200">
+        {/* Mobile Pull Indicator */}
+        <div className="w-10 h-1 bg-stone-300 rounded-full mx-auto mt-2 sm:hidden shrink-0" />
+
         {/* Modal Top Header */}
-        <div className="bg-white px-5 py-4 flex items-center justify-between border-b border-[#E8E2D8]">
+        <div className="bg-white px-4 sm:px-5 py-3.5 flex items-center justify-between border-b border-[#E8E2D8]">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-[#FAF5EE] text-[#9E4424] border border-[#E7D9C6]">
               <Feather className="w-5 h-5" />
@@ -192,7 +195,7 @@ export const SellerAddProductModal: React.FC<SellerAddProductModalProps> = ({
               </div>
 
               {/* Category, Brand, Condition */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-semibold text-stone-800 block mb-1">Kategori</label>
                   <select

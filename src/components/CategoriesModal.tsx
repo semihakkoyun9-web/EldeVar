@@ -141,8 +141,10 @@ export const CategoriesModal: React.FC<CategoriesModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#1C1917]/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-[#FAF8F5] w-full max-w-2xl rounded-3xl shadow-2xl border border-[#E4D8C4] overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 bg-[#1C1917]/70 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
+      <div className="bg-[#FAF8F5] w-full max-w-2xl rounded-t-3xl sm:rounded-3xl shadow-2xl border border-[#E4D8C4] overflow-hidden max-h-[94vh] sm:max-h-[90vh] animate-in fade-in slide-in-from-bottom-8 sm:zoom-in-95 duration-200 flex flex-col">
+        {/* Mobile Pull Indicator */}
+        <div className="w-10 h-1 bg-stone-300 rounded-full mx-auto mt-2 sm:hidden shrink-0" />
         
         {/* Header */}
         <div className="bg-white border-b border-[#E8E2D8] px-5 py-4 flex items-center justify-between">
@@ -409,7 +411,7 @@ export const CategoriesModal: React.FC<CategoriesModalProps> = ({
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 bg-white border-t border-[#E8E2D8] flex items-center justify-between">
+        <div className="p-3.5 sm:p-4 bg-white border-t border-[#E8E2D8] flex items-center justify-between pb-safe">
           <button
             onClick={() => {
               if (onResetAll) onResetAll();

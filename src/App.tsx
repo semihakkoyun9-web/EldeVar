@@ -551,6 +551,11 @@ export default function App() {
           notifications={notifications}
           onOpenCategoriesModal={() => setIsCategoriesModalOpen(true)}
           onNavigateHome={() => setActiveTab('home')}
+          onOpenSellerModal={() => setIsSellerModalOpen(true)}
+          onNavigateFavorites={() => setActiveTab('favorites')}
+          onNavigateMenu={() => setActiveTab('menu')}
+          favoritesCount={favorites.length}
+          cartCount={cartCount}
         />
       </div>
 
@@ -832,69 +837,196 @@ export default function App() {
             </div>
 
             {/* ========================================================= */}
-            {/* B. MOBİL UYGULAMA ARAYÜZÜ (Kullanıcının İstediği Orijinal Akış) */}
+            {/* B. MOBİL UYGULAMA ARAYÜZÜ (TAM MOBİL UYUMLU, SIFIRDAN DÜZEN) */}
             {/* ========================================================= */}
-            <div className="max-w-2xl mx-auto px-4 sm:px-6 py-5 pb-12 space-y-5 lg:hidden">
-              <section className="pt-1 pb-1">
-                <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#1C1917] tracking-tight mb-2">
-                  "Eski hikâyeler yeni sahibiyle canlanıyor."
-                </h1>
-                <p className="text-xs sm:text-sm text-stone-600 leading-relaxed font-sans">
-                  Tüketim çağının seri üretim nesneleri yerine, özenle kullanılmış ve hafızası olan eşyaları koruyoruz.
-                  EldeVar'da aldığınız her parça, önceki sahibinin hatıra notuyla gelir ve evinizde yeni bir hikâye başlatır.
-                </p>
+            <div className="max-w-2xl mx-auto px-3.5 sm:px-6 py-4 pb-28 space-y-4 lg:hidden">
+              {/* 1. MOBİL EDITORIAL HERO & MANİFESTO KARTI */}
+              <section className="bg-gradient-to-br from-[#FAF5EE] via-[#FDFBF7] to-[#F5ECE0] rounded-2xl border border-[#E8DEC8] p-4 shadow-xs relative overflow-hidden">
+                <div className="space-y-3">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 border border-[#E2DBD0] text-[#9E4424] text-[10px] font-bold uppercase tracking-wider shadow-2xs">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#9E4424]" />
+                    <span>Hafızası Olan İkinci El</span>
+                  </div>
+
+                  <h1 className="text-xl sm:text-2xl font-serif font-black text-[#1C1917] tracking-tight leading-snug">
+                    "Eski hikâyeler yeni sahibiyle canlanıyor."
+                  </h1>
+
+                  <p className="text-[11px] sm:text-xs text-stone-600 leading-relaxed font-sans">
+                    Tüketim çağının seri üretim nesneleri yerine, özenle kullanılmış eşyaları buluşturuyoruz. Her parça mum mühürlü hafıza mektubuyla gelir.
+                  </p>
+
+                  {/* Mobil Hızlı Eylem Butonları */}
+                  <div className="grid grid-cols-3 gap-2 pt-1">
+                    <button
+                      onClick={() => setActiveTab('categories')}
+                      className="py-2.5 px-2 rounded-xl bg-[#9E4424] active:bg-[#85361A] text-white font-bold text-[11px] flex flex-col items-center justify-center gap-1 shadow-xs cursor-pointer"
+                    >
+                      <Compass className="w-4 h-4" />
+                      <span className="leading-tight">Keşfet</span>
+                    </button>
+
+                    <button
+                      onClick={() => setActiveTab('wanted')}
+                      className="py-2.5 px-2 rounded-xl bg-white active:bg-stone-50 border border-[#DFCBB6] text-[#8C3F23] font-bold text-[11px] flex flex-col items-center justify-center gap-1 shadow-2xs cursor-pointer"
+                    >
+                      <Search className="w-4 h-4 text-[#9E4424]" />
+                      <span className="leading-tight">Arıyorum</span>
+                    </button>
+
+                    <button
+                      onClick={() => setIsSellerModalOpen(true)}
+                      className="py-2.5 px-2 rounded-xl bg-stone-900 active:bg-stone-800 text-white font-bold text-[11px] flex flex-col items-center justify-center gap-1 shadow-xs cursor-pointer"
+                    >
+                      <Sparkles className="w-4 h-4 text-amber-300" />
+                      <span className="leading-tight">+ İlan Ver</span>
+                    </button>
+                  </div>
+
+                  {/* 3 Güven Rozeti (Mobil Tek Sıra) */}
+                  <div className="grid grid-cols-3 gap-1.5 pt-2 border-t border-[#E8DACB]/70 text-[10px] text-stone-600 font-medium text-center">
+                    <div className="bg-white/80 py-1.5 px-1 rounded-lg border border-[#EBE4D8]">
+                      <span>🍃 1.850+ kg CO₂</span>
+                    </div>
+                    <div className="bg-white/80 py-1.5 px-1 rounded-lg border border-[#EBE4D8]">
+                      <span>📜 Mum Mühürlü</span>
+                    </div>
+                    <div className="bg-white/80 py-1.5 px-1 rounded-lg border border-[#EBE4D8]">
+                      <span>🛡️ Havuz Hesap</span>
+                    </div>
+                  </div>
+                </div>
               </section>
 
-              {/* Eşya Hafıza Pasaportu Vurgusu */}
-              <section className="p-3.5 rounded-2xl bg-[#FAF4ED] border border-[#EBD6C3] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-white text-[#9E4424] shadow-2xs border border-[#E2DBD0] shrink-0">
-                    <BookOpen className="w-5 h-5" />
+              {/* 2. CANLI "BUNU ARIYORUM" MOBİL TALEP KARTI */}
+              <section className="bg-white rounded-2xl p-3.5 border border-[#E8E2D8] shadow-2xs space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-[#9E4424] bg-[#FAF3E8] px-2 py-0.5 rounded-full border border-[#EBD6C3]">
+                      Bunu Arıyorum
+                    </span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[11px] font-bold text-emerald-700">Canlı Talep Ağı</span>
                   </div>
-                  <div>
-                    <div className="font-serif font-bold text-stone-900 text-xs sm:text-sm flex items-center gap-2">
-                      <span>Eşya Hafıza Pasaportu</span>
-                      <span className="text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#9E4424] text-white">
+
+                  <button
+                    onClick={() => setActiveTab('wanted')}
+                    className="text-[11px] font-bold text-[#9E4424] flex items-center gap-0.5 hover:underline cursor-pointer"
+                  >
+                    <span>Tümü ({wantedItems.length})</span>
+                    <ChevronRight className="w-3 h-3" />
+                  </button>
+                </div>
+
+                {/* Örnek Talep Önizleme */}
+                {wantedItems[0] && (
+                  <div
+                    onClick={() => setActiveTab('wanted')}
+                    className="p-3 rounded-xl bg-[#FAF8F5] border border-[#EFE8DD] hover:border-[#DFCBB6] transition-all cursor-pointer flex items-center justify-between gap-3"
+                  >
+                    <div className="min-w-0 flex-1 space-y-0.5">
+                      <div className="text-[10px] font-semibold text-[#8C3F23] truncate">
+                        {wantedItems[0].categoryLabel} • {wantedItems[0].offersCount} Teklif
+                      </div>
+                      <h4 className="font-serif font-bold text-stone-900 text-xs truncate">
+                        {wantedItems[0].title}
+                      </h4>
+                      <p className="text-[10px] text-stone-500 italic truncate">
+                        "{wantedItems[0].storyWhy}"
+                      </p>
+                    </div>
+
+                    <div className="shrink-0 text-right">
+                      <span className="text-[9px] text-stone-400 block">Bütçe:</span>
+                      <span className="text-[11px] font-bold text-stone-900 block">
+                        {wantedItems[0].targetBudgetMax.toLocaleString('tr-TR')} TL
+                      </span>
+                      <span className="text-[10px] font-extrabold text-[#9E4424] flex items-center gap-0.5 justify-end mt-0.5">
+                        <span>Bende Var!</span>
+                        <ChevronRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </section>
+
+              {/* 3. İMZA ÖZELLİK: EŞYA HAFIZA PASAPORTU VURGUSU */}
+              <section className="p-3 rounded-2xl bg-[#FAF4ED] border border-[#EBD6C3] flex items-center justify-between gap-2.5 text-xs">
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className="p-2 rounded-xl bg-white text-[#9E4424] shadow-2xs border border-[#E2DBD0] shrink-0">
+                    <BookOpen className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-serif font-bold text-stone-900 text-xs flex items-center gap-1.5 truncate">
+                      <span>Hafıza Pasaportu</span>
+                      <span className="text-[8px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded-full bg-[#9E4424] text-white shrink-0">
                         EldeVar'a Özel
                       </span>
                     </div>
-                    <p className="text-stone-600 mt-0.5 leading-normal text-[11px]">
-                      Her ürünün önceki sahibinin yazdığı veda mektubu ve karbon sertifikası mum mühürle gelir.
+                    <p className="text-stone-600 leading-tight text-[10px] truncate mt-0.5">
+                      Her eşyanın önceki sahibinden hatıra notu
                     </p>
                   </div>
                 </div>
 
                 <button
                   onClick={() => setSelectedPassportProduct(products[0])}
-                  className="w-full sm:w-auto px-3.5 py-1.5 bg-white border border-[#DFCBB6] text-[#8E3F23] font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                  className="shrink-0 px-2.5 py-1.5 bg-white border border-[#DFCBB6] text-[#8E3F23] font-bold rounded-xl text-[10px] flex items-center justify-center gap-1 shadow-2xs cursor-pointer active:scale-95"
                 >
-                  <Feather className="w-3.5 h-3.5 text-[#9E4424]" />
-                  <span>Örnek Pasaportu Gör</span>
+                  <Feather className="w-3 h-3 text-[#9E4424]" />
+                  <span>İncele</span>
                 </button>
               </section>
 
-              {/* Mobil Kategoriler Butonu */}
-              <div className="flex items-center justify-between border-b border-[#E8E2D8] pb-2">
-                <div>
-                  <h2 className="text-sm font-serif font-bold text-[#1C1917]">
-                    Öne Çıkan Eşyalar
-                  </h2>
-                  <p className="text-[11px] text-stone-500 font-sans">
-                    Kendini keşfet, stilini yarat
-                  </p>
+              {/* 4. KONDİSYON FİLTRE HAPLARI */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between border-b border-[#E8E2D8] pb-2">
+                  <div>
+                    <h2 className="text-sm font-serif font-bold text-[#1C1917]">
+                      Öne Çıkan Seçkiler
+                    </h2>
+                    <p className="text-[10px] text-stone-500 font-sans">
+                      Döngüsel & hafızalı koleksiyon
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('categories')}
+                    className="text-xs font-bold text-[#9E4424] flex items-center gap-0.5 hover:underline cursor-pointer"
+                  >
+                    <span>Tüm Vitrin</span>
+                    <ChevronRight className="w-3 h-3" />
+                  </button>
                 </div>
-                <button
-                  onClick={() => setActiveTab('categories')}
-                  className="text-xs font-bold text-[#9E4424] flex items-center gap-1 hover:underline cursor-pointer"
-                >
-                  <span>Kategoriler & Filtreler</span>
-                  <ChevronRight className="w-3 h-3" />
-                </button>
+
+                {/* Kondisyon Hapları (Yatay Kaydırılabilir) */}
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+                  {[
+                    { id: 'all', label: 'Tümü' },
+                    { id: 'yeni_gibi', label: 'Kusursuz' },
+                    { id: 'az_kullanilmis', label: 'Az Kullanılmış' },
+                    { id: 'vintage', label: 'Vintage' },
+                  ].map((tab) => {
+                    const isSelected = selectedCondition === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => setSelectedCondition(tab.id as ConditionKey | 'all')}
+                        className={`px-3 py-1 rounded-full text-[11px] whitespace-nowrap cursor-pointer transition-all ${
+                          isSelected
+                            ? 'bg-stone-900 text-white font-bold shadow-xs'
+                            : 'bg-white text-stone-700 border border-[#E5DDD1] active:bg-stone-50'
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
-              {/* Mobil Ürünler Izgarası */}
-              <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                {products.slice(0, 10).map((product) => (
+              {/* 5. MOBİL ÜRÜNLER IZGARASI (2 Kolonlu, Taşmayan Kartlar) */}
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-4">
+                {filteredProducts.slice(0, 10).map((product) => (
                   <ProductCard
                     key={product.id}
                     product={product}

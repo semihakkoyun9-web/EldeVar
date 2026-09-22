@@ -55,19 +55,22 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#1C1917]/70 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
-      <div className="bg-[#FAF8F5] w-full max-w-4xl rounded-2xl shadow-2xl border border-[#E8E2D8] overflow-hidden my-auto max-h-[92vh] flex flex-col relative animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 bg-[#1C1917]/70 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
+      <div className="bg-[#FAF8F5] w-full max-w-4xl rounded-t-3xl sm:rounded-2xl shadow-2xl border border-[#E8E2D8] overflow-hidden max-h-[94vh] sm:max-h-[90vh] flex flex-col relative animate-in fade-in slide-in-from-bottom-8 sm:zoom-in-95 duration-200">
+        {/* Mobile Pull Indicator */}
+        <div className="w-10 h-1 bg-stone-300 rounded-full mx-auto mt-2 sm:hidden shrink-0" />
+
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/90 hover:bg-white text-stone-700 shadow-md backdrop-blur-md transition-colors"
+          className="absolute top-3 right-3 z-20 p-2 rounded-full bg-white/90 hover:bg-white text-stone-700 shadow-md backdrop-blur-md transition-colors cursor-pointer"
           aria-label="Kapat"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Scrollable Body */}
-        <div className="overflow-y-auto p-4 sm:p-7 grid grid-cols-1 md:grid-cols-2 gap-7">
+        <div className="overflow-y-auto flex-1 p-4 sm:p-7 grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-7">
           {/* Left: Image Gallery & Eco Savings */}
           <div>
             <div className={`relative aspect-square w-full rounded-2xl overflow-hidden bg-white border-2 ${conditionTheme.borderClass} shadow-xs`}>
@@ -333,23 +336,38 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               </div>
             </div>
 
-            {/* Bottom Actions */}
-            <div className="mt-4 pt-4 border-t border-[#E8E2D8] flex items-center gap-3">
-              <button
-                onClick={() => onAddToCart(product, selectedVariation)}
-                className="flex-1 py-3 px-4 rounded-xl border-2 border-[#9E4424] text-[#9E4424] hover:bg-[#FAF5EE] active:scale-98 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                <span>Sepete Ekle</span>
-              </button>
+          </div>
+        </div>
 
-              <button
-                onClick={() => onBuyNow(product, selectedVariation)}
-                className="flex-1 py-3 px-4 rounded-xl bg-[#9E4424] hover:bg-[#85361A] active:scale-98 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md"
-              >
-                <span>Hemen Al & Sahip Çık</span>
-              </button>
+        {/* STICKY BOTTOM ACTION BAR (Always visible on mobile & desktop) */}
+        <div className="bg-white/95 backdrop-blur-md p-3.5 sm:p-4 border-t border-[#E8E2D8] flex items-center justify-between gap-3 shrink-0 pb-safe">
+          <div className="shrink-0">
+            <div className="text-[10px] text-stone-400 uppercase tracking-wider font-semibold">Toplam Fiyat</div>
+            <div className="text-base sm:text-xl font-extrabold text-[#1C1917]">
+              {currentPrice.toLocaleString('tr-TR')} TL
             </div>
+            {isFreeShipping && (
+              <span className="text-[10px] text-emerald-700 font-semibold block leading-tight">
+                Ücretsiz Kargo
+              </span>
+            )}
+          </div>
+
+          <div className="flex-1 flex items-center gap-2 max-w-md">
+            <button
+              onClick={() => onAddToCart(product, selectedVariation)}
+              className="flex-1 py-2.5 sm:py-3 px-3 rounded-xl border-2 border-[#9E4424] text-[#9E4424] hover:bg-[#FAF5EE] active:scale-98 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+            >
+              <ShoppingBag className="w-4 h-4 shrink-0" />
+              <span className="whitespace-nowrap">Sepete Ekle</span>
+            </button>
+
+            <button
+              onClick={() => onBuyNow(product, selectedVariation)}
+              className="flex-1 py-2.5 sm:py-3 px-3 rounded-xl bg-[#9E4424] hover:bg-[#85361A] active:scale-98 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer"
+            >
+              <span className="whitespace-nowrap">Hemen Al</span>
+            </button>
           </div>
         </div>
       </div>

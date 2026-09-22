@@ -195,7 +195,7 @@ export const HomeBottomSection: React.FC<HomeBottomSectionProps> = ({
       </div>
 
       {/* 2. GÖRSELDEKİ DETAYLI FOOTER (Tam Genişlikli Zemin, Ortalanmış max-w-7xl İçerik) */}
-      <footer className="w-full border-t border-[#E8E2D8] bg-[#FAF5EE]/90 pt-10 pb-12 text-stone-600 text-xs font-sans">
+      <footer className="w-full border-t border-[#E8E2D8] bg-[#FAF5EE]/90 pt-10 pb-28 sm:pb-12 text-stone-600 text-xs font-sans">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-8 mb-10">
             {/* Logo & Manifesto */}
@@ -209,7 +209,7 @@ export const HomeBottomSection: React.FC<HomeBottomSectionProps> = ({
               <p className="text-xs text-stone-500 leading-relaxed max-w-sm">
                 "Eski hikâyeler yeni sahibiyle canlanıyor." Tüketim çağında eşyaların hatırasını ve ömrünü uzatan yeni nesil ikinci el platformu.
               </p>
-              <div className="flex items-center gap-3 pt-1">
+              <div className="flex flex-wrap items-center gap-2 pt-1">
                 <span className="text-[11px] font-semibold text-stone-700 bg-stone-100 px-2.5 py-1 rounded-full border border-stone-200">
                   🌱 Karbon Tasarrufu Odaklı
                 </span>
@@ -261,9 +261,9 @@ export const HomeBottomSection: React.FC<HomeBottomSectionProps> = ({
           </div>
 
           {/* Alt Telif ve Yasal Bilgi */}
-          <div className="pt-6 border-t border-[#E8E2D8] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-stone-500">
+          <div className="pt-6 border-t border-[#E8E2D8] flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-stone-500 text-center sm:text-left">
             <p>© 2026 EldeVar Teknoloji A.Ş. Tüm hakları saklıdır.</p>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
               <span className="hover:underline cursor-pointer">Gizlilik Politikası</span>
               <span>•</span>
               <span className="hover:underline cursor-pointer">Kullanım Koşulları</span>
