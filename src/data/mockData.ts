@@ -1,7 +1,8 @@
-import { Product, Coupon } from '../types';
+import { Product, Coupon, Order, ProductOffer, KeepsakeItem } from '../types';
 
 export const FREE_SHIPPING_THRESHOLD = 750; // 750 TL üzeri ücretsiz kargo
 export const STANDARD_SHIPPING_FEE = 49.90; // Standart kargo ücreti
+export const COD_FEE = 19.90; // Kapıda ödeme hizmet bedeli
 
 export const AVAILABLE_COUPONS: Coupon[] = [
   {
@@ -82,6 +83,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1495105787522-5334e3ffa0ef?w=800&auto=format&fit=crop&q=80',
     ],
     story: {
       eraOrYear: '1994',
@@ -91,6 +93,12 @@ export const INITIAL_PRODUCTS: Product[] = [
       storyDetail: 'Bu ceket 1994 sonbaharında Kadıköy Akmar Pasajı civarındaki eski bir plakçıdan alınmıştı. İstanbul\'un yağmurlu kışlarında, üniversite konserlerinde ve vapur seyahatlerinde 30 yıl boyunca sahibine eşlik etti. Derisindeki doğal kırışıklıklar tamamen o yılların patinasıdır.',
       sellerFarewell: 'Dolabımda durup eskimesindense, yeni bir yolculuğa çıkmasını istedim. Yeni sahibine de aynı özgürlük hissini vermesini dilerim.',
     },
+    conditionChecklist: {
+      hasTag: true,
+      hasFlaws: false,
+      isCleanAndOdorFree: true,
+      isRepaired: false,
+    },
     seller: {
       id: 'seller-vintage-ist',
       name: 'RetroKadıköy',
@@ -99,6 +107,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       rating: 4.9,
       salesCount: 47,
       location: 'İstanbul, Kadıköy',
+      conditionAccuracyRate: 99,
     },
     isVariable: true,
     variations: [
@@ -128,7 +137,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     brand: "Levi's",
     description: 'W32 L32 ebatında, orijinal düğmeli patlet, taşlanmış açık mavi yıkama. Kuru temizlemesi yapılmış, paçaları orijinal kesimdir.',
     images: [
-      'https://images.unsplash.com/photo-1542272604-780c96856592?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1582552938357-32b906df40cb?w=800&auto=format&fit=crop&q=80',
     ],
     story: {
@@ -139,6 +149,13 @@ export const INITIAL_PRODUCTS: Product[] = [
       storyDetail: '90\'ların sonunda San Francisco Haight-Ashbury caddesindeki küçük bir vintage dükkanından alındı. 25 yıldır formunu kaybetmeyen saf pamuklu denim dokusu, bugün üretilen hızlı moda kotlarından bambaşka bir tokluğa sahip.',
       sellerFarewell: 'Beden değişimi sebebiyle ayrılıyorum; kot pantolonda ruh arayan bir vintage tutkununa emanet olsun.',
     },
+    conditionChecklist: {
+      hasTag: true,
+      hasFlaws: true,
+      flawDetails: 'Paça ucunda dönemsel vintage aşınması mevcuttur.',
+      isCleanAndOdorFree: true,
+      isRepaired: false,
+    },
     seller: {
       id: 'seller-vintage-ist',
       name: 'RetroKadıköy',
@@ -147,6 +164,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       rating: 4.9,
       salesCount: 47,
       location: 'İstanbul, Kadıköy',
+      conditionAccuracyRate: 98,
     },
     ecoSavings: { co2Kg: 16.2, waterLiters: 7600 },
     shippingFee: 49.90,
@@ -170,7 +188,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     brand: 'Burberry',
     description: 'Gardıropta koruyucu kılıfında saklanmış, sadece özel bir davette 2 saat giyilmiş. %80 Yün %20 Kaşmir karışımı, bej klasik İngiliz kalıbı.',
     images: [
-      'https://images.unsplash.com/photo-1539533018447-63fcce667883?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=800&auto=format&fit=crop&q=80',
     ],
     story: {
       eraOrYear: '2004',
@@ -212,6 +231,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     description: 'Özel koleksiyon serisi, kenarları el kıvırması kusursuz saf ipek. Orijinal kutusuyla gönderilecektir.',
     images: [
       'https://images.unsplash.com/photo-1601924994987-69e26d50dc26?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1584030373081-f37b7bb4fa8e?w=800&auto=format&fit=crop&q=80',
     ],
     story: {
       eraOrYear: '1988',
@@ -253,6 +273,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     description: 'Taban erimesi yoktur, orijinal İngiltere serisi. Sarı dikişli AirWair taban. Deri besleyici bakım kremiyle periyodik bakımı yapılmıştır.',
     images: [
       'https://images.unsplash.com/photo-1520639888713-7851133b1ed0?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800&auto=format&fit=crop&q=80',
     ],
     story: {
       eraOrYear: '2012',
@@ -295,6 +316,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=800&auto=format&fit=crop&q=80',
     ],
     story: {
       eraOrYear: '1978',
@@ -336,6 +358,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     description: 'Yedek kulak pedleri sıfırdır, bataryası tek şarjla 28+ saat gitmektedir. Orijinal seyahat kılıfı, 3.5mm kablosu ve uçak adaptörü eksiksiz mevcuttur.',
     images: [
       'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=800&auto=format&fit=crop&q=80',
     ],
     story: {
       eraOrYear: '2022',
@@ -377,6 +401,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     description: 'Ekranda tek bir kılcal çizik dahi yoktur, sıcak ışık ayarlı modeldir. Kılıfıyla beraber kutusunda muhafaza edilmiştir. Pil ömrü haftalarca dayanır.',
     images: [
       'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1592496431122-2349e0fbc666?w=800&auto=format&fit=crop&q=80',
     ],
     story: {
       eraOrYear: '2023',
@@ -418,6 +443,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     description: 'Pil sağlığı %89\'dur. Orijinal manyetik hızlı şarj kablosu ve kutusu ile verilecektir. Ekran koruyucu ile kullanılmıştır.',
     images: [
       'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1510017803434-a899398421b3?w=800&auto=format&fit=crop&q=80',
     ],
     story: {
       eraOrYear: '2022',
@@ -459,7 +485,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     description: 'Shure M75 orijinal iğne ve manyetik kartuşu üzerindedir. Ahşap kasası kusursuz cilalanmış, otomatik kol inişi ve kalkışı mekanik olarak yağlanıp kalibre edilmiştir.',
     images: [
       'https://images.unsplash.com/photo-1539185441755-769473a23570?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1603048588665-791ca8aea617?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1461360370896-922624d12aa1?w=800&auto=format&fit=crop&q=80',
     ],
     story: {
       eraOrYear: '1974',
@@ -501,6 +527,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     description: 'Yaklaşık 45 yıllık saf koyun yünü ve doğal kök boyalar ile dokunmuş geleneksel Bergama motifi. Profesyonel el halısı yıkamasından geçmiştir, steril ve kullanıma hazırdır.',
     images: [
       'https://images.unsplash.com/photo-1600121848594-d8644e57abab?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1579656381226-5fc0f0100c3b?w=800&auto=format&fit=crop&q=80',
     ],
     story: {
       eraOrYear: '1979',
@@ -542,6 +569,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     description: 'Ağır pirinç döküm, retro opal cam abajurlu. Çalışma masası veya komodin üstü için zamansız bir aydınlatma. Kablolaması ve açma-kapama anahtarı yenilenmiştir.',
     images: [
       'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=800&auto=format&fit=crop&q=80',
     ],
     story: {
       eraOrYear: '1985',
@@ -583,6 +611,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     description: 'Doğal organik keten tohumu yağı ile koruma altına alınmış el işçiliği masif meşe. Çiziksiz, sağlam ve hafif konik ayaklı şık model.',
     images: [
       'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1532372320572-cda25653a26d?w=800&auto=format&fit=crop&q=80',
     ],
     story: {
       eraOrYear: '1968',
@@ -624,6 +653,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     description: 'Nefes alan viskon kumaş, beli kuşaklı zarif retro desenli midi elbise. Hiç giyilmemiş, gardıropta saklanmıştır.',
     images: [
       'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=800&auto=format&fit=crop&q=80',
     ],
     story: {
       eraOrYear: '2023',
@@ -665,6 +695,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     description: '%100 Pamuklu fitilli yumuşak kadife, ayarlanabilir askılı hardal sarısı retro salopet.',
     images: [
       'https://images.unsplash.com/photo-1519457431-44ccd64a579b?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&auto=format&fit=crop&q=80',
     ],
     story: {
       eraOrYear: '2021',
@@ -706,6 +737,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     description: 'Ön frenleri sağlam, PU silikon sessiz tekerlekler, ayarlanabilir mekanizma.',
     images: [
       'https://images.unsplash.com/photo-1594911772125-07fc7a2d8d9f?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1563822249548-9a72b6353cd1?w=800&auto=format&fit=crop&q=80',
     ],
     story: {
       eraOrYear: '2022',
@@ -747,6 +779,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     description: 'Ağır pamuk kanvas, parlak krem kauçuk burun ve taban. Yalnızca 2 kez stüdyoda giyildi.',
     images: [
       'https://images.unsplash.com/photo-1607522370275-f14206abe5d3?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1575537302964-96cd47c06b1b?w=800&auto=format&fit=crop&q=80',
     ],
     story: {
       eraOrYear: '2023',
@@ -788,6 +822,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     description: '15.6 inç laptop bölmeli, pirinç tokalı, el yapımı kalın taba deri evrak çantası. Doğal deri cilasıyla bakımı yapılmıştır.',
     images: [
       'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&auto=format&fit=crop&q=80',
     ],
     story: {
       eraOrYear: '2018',
@@ -811,6 +846,254 @@ export const INITIAL_PRODUCTS: Product[] = [
     views: 420,
     likes: 89,
     createdAt: '2026-09-20T16:00:00Z',
+  },
+  // 19. KADIN GİYİM (3. Ürün)
+  {
+    id: 'prod-19',
+    title: 'Massimo Dutti %100 Saf Kaşmir Boğazlı Vintage Triko Kazak',
+    category: 'kadin',
+    categoryLabel: 'Kadın Kazak & Triko',
+    price: 1150,
+    originalPrice: 3400,
+    condition: 'Kusursuz (Yeni Gibi)',
+    conditionType: 'yeni_gibi',
+    size: 'M',
+    passportCode: 'EV-2019-DUTTI',
+    brand: 'Massimo Dutti',
+    description: '%100 saf Moğolistan kaşmiri, balıksırtı örgü detaylı, kum beji renginde boğazlı triko. Tüylenme veya esneme yoktur, orijinal kumaş dokusunu korumaktadır.',
+    images: [
+      'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=800&auto=format&fit=crop&q=80',
+    ],
+    story: {
+      eraOrYear: '2019',
+      originCity: 'Nişantaşı, İstanbul',
+      travelBadge: 'Kış Dağ Tatili Hatırası',
+      memoryQuote: 'Uludağ tatilinde sadece iki kez giyildi; yumuşacık ve sıcacık tutan zamansız bir parça.',
+      storyDetail: 'Kuru temizleme koruma torbasında saklandı. Hızlı moda sentetik trikolarından farklı olarak saf kaşmir lifleriyle örülmüştür.',
+      sellerFarewell: 'Soğuk kış günlerinde yeni sahibini sevgiyle sarsın ve ısıtsın.',
+    },
+    seller: {
+      id: 'seller-semih-store',
+      name: 'Semih Akkoyun',
+      email: 'semihakkoyun9@gmail.com',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&auto=format&fit=crop&q=80',
+      rating: 5.0,
+      salesCount: 16,
+      location: 'Eskişehir / Kadıköy',
+    },
+    ecoSavings: { co2Kg: 18.2, waterLiters: 3600 },
+    shippingFee: 0,
+    views: 312,
+    likes: 47,
+    createdAt: '2026-09-23T11:00:00Z',
+  },
+  // 20. KADIN GİYİM (4. Ürün)
+  {
+    id: 'prod-20',
+    title: 'Vintage 80\'ler Fransız Pileli Yüksek Bel Yün Midi Etek',
+    category: 'kadin',
+    categoryLabel: 'Kadın Etek & Takım',
+    price: 850,
+    originalPrice: 2100,
+    condition: 'Çok İyi (Az Kullanılmış)',
+    conditionType: 'az_kullanilmis',
+    size: '38',
+    passportCode: 'EV-1988-ETEK',
+    brand: 'Retro / Özel Zanaat',
+    description: '1988 Paris Rue de Rivoli butiğinden alınmış, astarlı, ekose yün kumaşlı yüksek bel kloş midi etek. Orijinal kemer köprüleri ve sedef düğmesi mevcuttur.',
+    images: [
+      'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=800&auto=format&fit=crop&q=80',
+    ],
+    story: {
+      eraOrYear: '1988',
+      originCity: 'Paris → Kadıköy',
+      travelBadge: 'Paris Sonbahar Hatırası',
+      memoryQuote: 'Annemin Paris seyahatinde seçtiği ve özenle dolabında sakladığı zarif bir sonbahar eteği.',
+      storyDetail: 'Kumaş kalınlığı ve dökümü son derece kaliteli yün dokumadır. Pileleri bozulmamıştır.',
+      sellerFarewell: 'Vintage giyinmeyi ve nostaljik şıklığı seven birine devretmekten mutluluk duyarım.',
+    },
+    seller: {
+      id: 'seller-vintage-ist',
+      name: 'RetroKadıköy',
+      email: 'satici.deneme@gmail.com',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+      rating: 4.9,
+      salesCount: 47,
+      location: 'İstanbul, Kadıköy',
+    },
+    ecoSavings: { co2Kg: 14.0, waterLiters: 2900 },
+    shippingFee: 0,
+    views: 265,
+    likes: 38,
+    createdAt: '2026-09-23T14:00:00Z',
+  },
+  // 21. ERKEK GİYİM (3. Ürün)
+  {
+    id: 'prod-21',
+    title: 'Ralph Lauren Orijinal Ekose Vintage Ağır Pamuk Oduncu Gömlek',
+    category: 'erkek',
+    categoryLabel: 'Erkek Gömlek & Ceket',
+    price: 950,
+    originalPrice: 2800,
+    condition: 'Çok İyi (Az Kullanılmış)',
+    conditionType: 'az_kullanilmis',
+    size: 'L',
+    passportCode: 'EV-2004-POLO',
+    brand: 'Ralph Lauren',
+    description: 'Ağır gramajlı %100 pazen pamuk, kırmızı-lacivert ekose desenli, sedef çıtçıt düğmeli orijinal vintage Ralph Lauren gömlek. Hem ceket gibi hem gömlek olarak kullanılabilir.',
+    images: [
+      'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=800&auto=format&fit=crop&q=80',
+    ],
+    story: {
+      eraOrYear: '2004',
+      originCity: 'Bolu Göynük → Eskişehir',
+      travelBadge: 'Sonbahar Kamp Hatırası',
+      memoryQuote: 'Yedigöller kamp gezilerinde sıcacık tutan, hiç eskimeyen efsane bir dokuma.',
+      storyDetail: 'Kumaş tokluğu bugün üretilen ince gömleklerle kıyaslanamaz. Yıkanmış ve tertemiz durumda.',
+      sellerFarewell: 'Doğayı ve rustik tarzı seven bir sonraki sahibine güzel maceralar yaşatsın.',
+    },
+    seller: {
+      id: 'seller-semih-store',
+      name: 'Semih Akkoyun',
+      email: 'semihakkoyun9@gmail.com',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&auto=format&fit=crop&q=80',
+      rating: 5.0,
+      salesCount: 16,
+      location: 'Eskişehir / Kadıköy',
+    },
+    ecoSavings: { co2Kg: 16.5, waterLiters: 3200 },
+    shippingFee: 0,
+    views: 390,
+    likes: 62,
+    createdAt: '2026-09-24T08:00:00Z',
+  },
+  // 22. ERKEK GİYİM (4. Ürün)
+  {
+    id: 'prod-22',
+    title: 'Barbour Orijinal Vintage Waxed Yağlı Pamuk Avcı Parka Ceket',
+    category: 'erkek',
+    categoryLabel: 'Erkek Mont & Parka',
+    price: 2450,
+    originalPrice: 7500,
+    condition: 'İyi (Yaşanmışlık İzi Var)',
+    conditionType: 'cok_kullanilmis',
+    size: 'L',
+    passportCode: 'EV-1999-BARBOUR',
+    brand: 'Schott NYC Vintage',
+    description: 'Geleneksel İngiliz yağlı pamuk (waxed cotton), ekose pamuk astar, kadife yaka ve çift yönlü pirinç fermuar. Yağ bakımı yeni yapılmış, harika bir yağmurluk ve rüzgarlık mont.',
+    images: [
+      'https://images.unsplash.com/photo-1544441893-675973e31985?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1548883354-7622d03aca27?w=800&auto=format&fit=crop&q=80',
+    ],
+    story: {
+      eraOrYear: '1999',
+      originCity: 'Edinburgh → İstanbul',
+      travelBadge: 'İskoçya Yağmurları Hatırası',
+      memoryQuote: 'Sisli ve yağmurlu yayla rotalarında üzerimdeydi, su geçirmezliği efsanedir.',
+      storyDetail: 'Zamanla kazandığı wax patinası montu eşsiz kılıyor. Vintage giyim severler için tam bir koleksiyon parçası.',
+      sellerFarewell: 'Yeni sahibine fırtınalarda güven, sokaklarda zamansız bir karizma katmasını dilerim.',
+    },
+    seller: {
+      id: 'seller-vintage-ist',
+      name: 'RetroKadıköy',
+      email: 'satici.deneme@gmail.com',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+      rating: 4.9,
+      salesCount: 47,
+      location: 'İstanbul, Kadıköy',
+    },
+    ecoSavings: { co2Kg: 28.0, waterLiters: 5200 },
+    shippingFee: 0,
+    views: 512,
+    likes: 94,
+    createdAt: '2026-09-24T12:00:00Z',
+  },
+  // 23. ÇANTA & AKSESUAR (3. Ürün)
+  {
+    id: 'prod-23',
+    title: 'Orijinal Bausch & Lomb Ray-Ban Vintage Aviator Damla Güneş Gözlüğü',
+    category: 'canta_aksesuar',
+    categoryLabel: 'Çanta & Aksesuar',
+    price: 1250,
+    originalPrice: 3200,
+    condition: 'Kusursuz (Yeni Gibi)',
+    conditionType: 'yeni_gibi',
+    size: '58 Ekartman',
+    passportCode: 'EV-1992-RAYBAN',
+    brand: 'Vakko',
+    description: 'Made in USA, orijinal B&L lazer kazımalı G-15 mineral camlar, altın kaplama metal gövde. Orijinal vintage deri çıtçıtlı kılıfı ve garanti kartı ile birlikte.',
+    images: [
+      'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1508296695146-257a814070b4?w=800&auto=format&fit=crop&q=80',
+    ],
+    story: {
+      eraOrYear: '1992',
+      originCity: 'İzmir Kordon',
+      travelBadge: 'Ege Yazları Klasiği',
+      memoryQuote: 'Çeşme ve Bodrum yazlarında gözümden düşürmediğim, optik kalitesi kusursuz bir miras.',
+      storyDetail: 'Camlarında en ufak çizik dahi yoktur. Günümüzde üretilen modellerden çok daha ağırbaşlı ve kaliteli optik cama sahiptir.',
+      sellerFarewell: 'Yeni sahibine güneşli ve unutulmaz anlar eşlik etsin.',
+    },
+    seller: {
+      id: 'seller-vintage-izmir',
+      name: 'EgeVintage',
+      email: 'satici.izmir@gmail.com',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
+      rating: 4.8,
+      salesCount: 31,
+      location: 'İzmir, Alsancak',
+    },
+    ecoSavings: { co2Kg: 8.5, waterLiters: 1400 },
+    shippingFee: 0,
+    views: 430,
+    likes: 71,
+    createdAt: '2026-09-24T15:00:00Z',
+  },
+  // 24. ÇANTA & AKSESUAR (4. Ürün)
+  {
+    id: 'prod-24',
+    title: 'Seiko 5 Otomatik Vintage Kurmalı Çelik Mekanik Kol Saati',
+    category: 'canta_aksesuar',
+    categoryLabel: 'Çanta & Aksesuar',
+    price: 1850,
+    originalPrice: 4500,
+    condition: 'Çok İyi (Az Kullanılmış)',
+    conditionType: 'az_kullanilmis',
+    size: '37mm Kasa',
+    passportCode: 'EV-1985-SEIKO',
+    brand: 'Retro / Özel Zanaat',
+    description: '1985 üretimi Seiko 7S26 mekanizmalı, gün ve tarih göstergeli, orijinal çelik jubilee kordonlu otomatik mekanik saat. Bakımı ve polisajı yeni yapılmış, zaman tutuşu dakiktir.',
+    images: [
+      'https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1533139502658-0198f920d8e8?w=800&auto=format&fit=crop&q=80',
+    ],
+    story: {
+      eraOrYear: '1985',
+      originCity: 'Ankara Kızılay',
+      travelBadge: 'Zamanın Mekanik Kalbi',
+      memoryQuote: 'Babama ilk işe başladığında dedemin hediye ettiği, 40 yıldır tıkır tıkır çalışan güvenilir mekanizma.',
+      storyDetail: 'Pile ihtiyaç duymadan bilek hareketiyle çalışır. Camı çiziksizdir.',
+      sellerFarewell: 'Yeni sahibine zamanı kıymetli yaşamayı hatırlatması dileğiyle.',
+    },
+    seller: {
+      id: 'seller-semih-store',
+      name: 'Semih Akkoyun',
+      email: 'semihakkoyun9@gmail.com',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&auto=format&fit=crop&q=80',
+      rating: 5.0,
+      salesCount: 16,
+      location: 'Eskişehir / Kadıköy',
+    },
+    ecoSavings: { co2Kg: 11.2, waterLiters: 1900 },
+    shippingFee: 0,
+    views: 480,
+    likes: 85,
+    createdAt: '2026-09-24T18:00:00Z',
   },
 ];
 
@@ -840,3 +1123,185 @@ export const BANK_ACCOUNTS = [
     logo: '🔴',
   },
 ];
+
+export const INITIAL_ORDERS: Order[] = [
+  {
+    id: 'ord-test-1',
+    orderNumber: 'EV-84210',
+    date: '2026-09-22T14:30:00Z',
+    items: [
+      {
+        product: INITIAL_PRODUCTS[0],
+        selectedVariation: INITIAL_PRODUCTS[0].variations?.[1],
+        quantity: 1,
+      },
+    ],
+    subtotal: 1750,
+    discount: 175,
+    shipping: 0,
+    total: 1575,
+    couponCode: 'ELDEVAR10',
+    paymentMethod: 'bacs',
+    paymentMethodTitle: 'Banka Havalesi / EFT (WooCommerce BACS)',
+    bankDetails: {
+      bankName: 'T.C. Ziraat Bankası',
+      accountHolder: 'EldeVar Pazaryeri A.Ş.',
+      iban: 'TR12 0001 0090 1234 5678 5001',
+      descriptionCode: 'Sipariş #EV-84210 Semih',
+    },
+    trackingNumber: 'YURTİÇİ-8391024',
+    customer: {
+      name: 'Semih Akkoyun',
+      email: 'semihakkoyun9@gmail.com',
+      phone: '0532 555 44 33',
+      address: 'Tepebaşı Mah. Üniversite Cad. No: 14 D: 3',
+      city: 'Eskişehir',
+    },
+    status: 'completed',
+    vendorIds: ['seller-vintage-ist'],
+  },
+  {
+    id: 'ord-test-2',
+    orderNumber: 'EV-84211',
+    date: '2026-09-24T11:15:00Z',
+    items: [
+      {
+        product: INITIAL_PRODUCTS[1],
+        quantity: 1,
+      },
+    ],
+    subtotal: 920,
+    discount: 75,
+    shipping: 0,
+    total: 845,
+    couponCode: 'YESILGARDROP',
+    paymentMethod: 'cod',
+    paymentMethodTitle: 'Kapıda Ödeme (Nakit / Kredi Kartı)',
+    trackingNumber: 'ARAS-4921092',
+    customer: {
+      name: 'Semih Akkoyun',
+      email: 'semihakkoyun9@gmail.com',
+      phone: '0532 555 44 33',
+      address: 'Tepebaşı Mah. Üniversite Cad. No: 14 D: 3',
+      city: 'Eskişehir',
+    },
+    status: 'shipped',
+    vendorIds: ['seller-vintage-izmir'],
+  },
+  {
+    id: 'ord-test-3',
+    orderNumber: 'EV-84212',
+    date: '2026-09-25T09:40:00Z',
+    items: [
+      {
+        product: INITIAL_PRODUCTS[2],
+        quantity: 1,
+      },
+    ],
+    subtotal: 480,
+    discount: 0,
+    shipping: 49.90,
+    total: 529.90,
+    paymentMethod: 'bacs',
+    paymentMethodTitle: 'Banka Havalesi / EFT',
+    bankDetails: {
+      bankName: 'Garanti BBVA',
+      accountHolder: 'EldeVar Pazaryeri A.Ş.',
+      iban: 'TR62 0006 2000 0001 2345 6789 01',
+      descriptionCode: 'Sipariş #EV-84212 Semih',
+    },
+    customer: {
+      name: 'Semih Akkoyun',
+      email: 'semihakkoyun9@gmail.com',
+      phone: '0532 555 44 33',
+      address: 'Tepebaşı Mah. Üniversite Cad. No: 14 D: 3',
+      city: 'Eskişehir',
+    },
+    status: 'pending_payment',
+    vendorIds: ['seller-anne-bebek'],
+  },
+];
+
+export const INITIAL_OFFERS: ProductOffer[] = [
+  {
+    id: 'offer-1',
+    productId: 'prod-1',
+    productTitle: 'Vintage 90\'lar Oversize Hakiki Deri Bomber Ceket',
+    productImage: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&auto=format&fit=crop&q=80',
+    originalPrice: 1850,
+    offeredPrice: 1600,
+    discountPercentage: 14,
+    buyerName: 'Eren Yılmaz',
+    buyerEmail: 'eren.yilmaz@gmail.com',
+    message: 'Öğrenciyim, Moda sahilinde giymeyi çok isterim. Kabul ederseniz hemen satın alacağım!',
+    status: 'pending',
+    createdAt: '2026-09-25T12:30:00Z',
+  },
+  {
+    id: 'offer-2',
+    productId: 'prod-2',
+    productTitle: 'Orijinal Levi\'s 501 Made in USA Vintage Jean Pantolon',
+    productImage: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=800&auto=format&fit=crop&q=80',
+    originalPrice: 920,
+    offeredPrice: 800,
+    discountPercentage: 13,
+    buyerName: 'Canberk Demir',
+    buyerEmail: 'canberk@gmail.com',
+    message: 'Tam aradığım yıkama. 800 TL\'ye anlaşırsak kartla hemen ödüyorum.',
+    status: 'accepted',
+    createdAt: '2026-09-24T18:10:00Z',
+  },
+];
+
+export const INITIAL_KEEPSAKES: KeepsakeItem[] = [
+  {
+    id: 'keep-1',
+    productId: 'prod-1',
+    title: 'Vintage 90\'lar Oversize Hakiki Deri Bomber Ceket',
+    image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&auto=format&fit=crop&q=80',
+    brand: 'Schott NYC Vintage',
+    categoryLabel: 'Erkek Ceket & Mont',
+    passportCode: 'EV-1994-BOMBER',
+    eraOrYear: '1994',
+    originCity: 'Kadıköy, İstanbul',
+    travelBadge: '90\'lar Kadıköy Konser Hatırası',
+    sellerFarewell: 'Dolabımda durup eskimesindense, yeni bir yolculuğa çıkmasını istedim. Yeni sahibine de aynı özgürlük hissini vermesini dilerim.',
+    sellerName: 'RetroKadıköy',
+    acquiredDate: '22 Eylül 2026',
+    buyerPersonalNote: 'Kadıköy vapurunda üzerimdeydi, derisinin kokusu ve kalıbı muhteşem.',
+  },
+  {
+    id: 'keep-2',
+    productId: 'prod-2',
+    title: 'Orijinal Levi\'s 501 Made in USA Vintage Jean Pantolon',
+    image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=800&auto=format&fit=crop&q=80',
+    brand: "Levi's",
+    categoryLabel: 'Erkek Jean & Pantolon',
+    passportCode: 'EV-1998-501',
+    eraOrYear: '1998',
+    originCity: 'San Francisco → İzmir',
+    travelBadge: 'Okyanus Aşırı 501 Klasiği',
+    sellerFarewell: 'Beden değişimi sebebiyle ayrılıyorum; kot pantolonda ruh arayan bir vintage tutkununa emanet olsun.',
+    sellerName: 'Vintageİzmir',
+    acquiredDate: '24 Eylül 2026',
+    buyerPersonalNote: 'Tam oturdu, 90\'lar saf denim kumaşı bugünkü kotlardan çok daha dayanıklı.',
+  },
+  {
+    id: 'keep-3',
+    productId: 'prod-3',
+    title: 'Burberry Vintage Desenli İtalyan Yün Kaşmir Palto',
+    image: 'https://images.unsplash.com/photo-1539533018447-63fcce667883?w=800&auto=format&fit=crop&q=80',
+    brand: 'Burberry',
+    categoryLabel: 'Kadın Palto & Kaban',
+    passportCode: 'EV-1988-BURBERRY',
+    eraOrYear: '1988',
+    originCity: 'Beyoğlu, İstanbul',
+    travelBadge: 'Pera Kış Zarafeti',
+    sellerFarewell: 'Annemin ilk öğretmenlik maaşıyla aldığı kabanı. Ona en az bizim kadar iyi bakacak birine emanet ediyorum.',
+    sellerName: 'PeraAntika',
+    acquiredDate: '15 Eylül 2026',
+    buyerPersonalNote: 'Dikişleri ve kumaş kalitesi inanılmaz, sıcacık tutuyor.',
+  },
+];
+
+

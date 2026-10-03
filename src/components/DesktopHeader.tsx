@@ -4,8 +4,8 @@
  */
 
 import React, { useState } from 'react';
-import { Search, Heart, ShoppingBag, Plus, Bell, ChevronDown, BookOpen, Compass, ArrowRight } from 'lucide-react';
-import { ProductCategory, NotificationItem } from '../types';
+import { Search, Heart, ShoppingBag, Plus, Bell, ChevronDown, BookOpen, Compass, ArrowRight, LogIn } from 'lucide-react';
+import { ProductCategory, NotificationItem, AuthUser } from '../types';
 import { TabType } from './BottomNav';
 import { EldeVarSeal } from './EldeVarLogo';
 
@@ -22,6 +22,9 @@ interface DesktopHeaderProps {
   notifications: NotificationItem[];
   onOpenSellerModal: () => void;
   onOpenPassportSample: () => void;
+  onOpenMemoryBox?: () => void;
+  currentUser?: AuthUser | null;
+  onOpenAuthModal?: () => void;
 }
 
 export const DesktopHeader: React.FC<DesktopHeaderProps> = ({
@@ -37,6 +40,9 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = ({
   notifications,
   onOpenSellerModal,
   onOpenPassportSample,
+  onOpenMemoryBox,
+  currentUser,
+  onOpenAuthModal,
 }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
@@ -173,6 +179,18 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = ({
             <span>İlan Ver</span>
           </button>
 
+          {/* Hatıra Kutusu Butonu */}
+          {onOpenMemoryBox && (
+            <button
+              onClick={onOpenMemoryBox}
+              className="h-9 px-3 rounded-full bg-[#FAF3EB] hover:bg-[#F3E5D3] text-[#8C3F23] border border-[#EBD4BF] font-semibold text-xs flex items-center gap-1.5 shadow-2xs hover:shadow-xs transition-all active:scale-95 cursor-pointer"
+              title="Eşya Hatıra Kutusu"
+            >
+              <span>🧳</span>
+              <span>Hatıra Kutusu</span>
+            </button>
+          )}
+
           {/* 2. Favorilerim (Kompakt Yuvarlak İkon) */}
           <button
             onClick={() => onTabChange('favorites')}
@@ -269,21 +287,39 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = ({
             )}
           </div>
 
-          {/* 5. Profil / Hesabım (EN SAĞDA) */}
-          <button
-            onClick={() => onTabChange('menu')}
-            className={`h-9 pl-1 pr-3 rounded-full border transition-all cursor-pointer flex items-center gap-2 text-xs font-semibold shadow-2xs ${
-              activeTab === 'menu'
-                ? 'bg-[#FAF4ED] text-[#9E4424] border-[#EBD6C3] ring-1 ring-[#9E4424]/20'
-                : 'bg-[#FAF8F5] hover:bg-[#F2ECE2] text-stone-800 border-[#E5DDD1]'
-            }`}
-            title="Hesabım & Profilim"
-          >
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#2D2620] to-[#1C1917] text-[#FAF4ED] flex items-center justify-center text-[11px] font-serif font-bold shadow-2xs border border-[#44382F]">
-              S
-            </div>
-            <span>Hesabım</span>
-          </button>
+          {/* 5. Profil / Hesabım / Giriş Yap (EN SAĞDA) */}
+          {currentUser ? (
+            <button
+              onClick={() => onTabChange('menu')}
+              className={`h-9 pl-1 pr-3 rounded-full border transition-all cursor-pointer flex items-center gap-2 text-xs font-semibold shadow-2xs ${
+                activeTab === 'menu'
+                  ? 'bg-[#FAF4ED] text-[#9E4424] border-[#EBD6C3] ring-1 ring-[#9E4424]/20'
+                  : 'bg-[#FAF8F5] hover:bg-[#F2ECE2] text-stone-800 border-[#E5DDD1]'
+              }`}
+              title="Hesabım & Profilim"
+            >
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#2D2620] to-[#1C1917] text-[#FAF4ED] flex items-center justify-center text-[11px] font-serif font-bold shadow-2xs border border-[#44382F] overflow-hidden">
+                {currentUser.avatar ? (
+                  <img src={currentUser.avatar} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  currentUser.name.charAt(0)
+                )}
+              </div>
+              <span>{currentUser.name.split(' ')[0]}</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                if (onOpenAuthModal) onOpenAuthModal();
+                else onTabChange('menu');
+              }}
+              className="h-9 px-3 rounded-full border border-[#9E4424]/30 bg-[#FAF4ED] hover:bg-[#F4EAE0] text-[#9E4424] font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all active:scale-95 cursor-pointer"
+              title="Giriş Yap veya Kayıt Ol"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Giriş Yap</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -372,16 +408,6 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = ({
             </button>
           </nav>
 
-          {/* Sağ: Eşya Hafıza Pasaportu Linki */}
-          <div className="hidden lg:flex items-center gap-3">
-            <button
-              onClick={onOpenPassportSample}
-              className="text-xs font-semibold text-[#8E3F23] hover:text-[#702F17] flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#E2DBD0] hover:bg-[#FDF9F5] shadow-2xs transition-colors cursor-pointer"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-[#9E4424]" />
-              <span>Hafıza Pasaportu Nasıl Çalışır?</span>
-            </button>
-          </div>
         </div>
       </div>
     </header>

@@ -1,0 +1,29 @@
+<svg width="64" height="64" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="waxOuter" cx="38%" cy="32%" r="65%">
+      <stop offset="0%" stop-color="#A44D29" />
+      <stop offset="40%" stop-color="#8C3A1C" />
+      <stop offset="75%" stop-color="#6E2B14" />
+      <stop offset="100%" stop-color="#4A1A0B" />
+    </radialGradient>
+    <radialGradient id="waxInner" cx="42%" cy="38%" r="55%">
+      <stop offset="0%" stop-color="#9C4422" />
+      <stop offset="65%" stop-color="#7B3319" />
+      <stop offset="100%" stop-color="#541F0E" />
+    </radialGradient>
+    <linearGradient id="ringLight" x1="25%" y1="20%" x2="75%" y2="85%">
+      <stop offset="0%" stop-color="#C96D46" />
+      <stop offset="100%" stop-color="#381307" />
+    </linearGradient>
+  </defs>
+
+  <!-- Dış Balmumu Dalgası -->
+  <path d="M 50 3 C 56 3, 61 7, 66 7 C 72 7, 77 4, 82 8 C 87 12, 86 18, 90 23 C 94 28, 98 32, 98 38 C 98 44, 94 48, 95 54 C 96 60, 99 65, 96 71 C 93 77, 87 78, 83 83 C 79 88, 77 94, 71 96 C 65 98, 60 94, 54 96 C 48 98, 43 96, 38 96 C 33 96, 27 98, 22 94 C 17 90, 18 84, 14 80 C 10 76, 3 73, 3 67 C 3 61, 7 56, 6 50 C 5 44, 2 39, 4 33 C 6 27, 12 25, 15 20 C 18 15, 20 8, 26 6 C 32 4, 37 7, 43 5 C 46 3, 48 3, 50 3 Z" fill="url(#waxOuter)" />
+
+  <!-- İç Halka Çukuru & Kabartması -->
+  <circle cx="50" cy="51" r="34" fill="none" stroke="#331006" stroke-width="3" opacity="0.8" />
+  <circle cx="50" cy="50" r="34" fill="url(#waxInner)" stroke="url(#ringLight)" stroke-width="2.2" />
+
+  <!-- EV Monogramı -->
+  <text x="50" y="58" text-anchor="middle" fill="#FAF3E8" font-size="28" font-family="Georgia, serif" font-weight="bold">EV</text>
+</svg>

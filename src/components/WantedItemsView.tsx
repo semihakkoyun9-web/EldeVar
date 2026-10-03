@@ -782,7 +782,7 @@ export const WantedItemsView: React.FC<WantedItemsViewProps> = ({
                                 alt="Teklif görseli"
                                 referrerPolicy="no-referrer"
                                 onError={(e) => {
-                                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1542272604-780c96856592?w=600&auto=format&fit=crop&q=80';
+                                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&auto=format&fit=crop&q=80';
                                 }}
                                 className="w-full h-36 object-cover"
                               />
@@ -925,7 +925,7 @@ const CreateWantedModal: React.FC<CreateWantedModalProps> = ({ onClose, onSubmit
     canta_aksesuar: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&auto=format&fit=crop&q=80',
     ev_yasam: 'https://images.unsplash.com/photo-1539185441755-769473a23570?w=600&auto=format&fit=crop&q=80',
     cocuk: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=600&auto=format&fit=crop&q=80',
-    giyim: 'https://images.unsplash.com/photo-1542272604-780c96856592?w=600&auto=format&fit=crop&q=80',
+    giyim: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&auto=format&fit=crop&q=80',
   };
 
   const getCategoryLabel = (cat: ProductCategory) => {

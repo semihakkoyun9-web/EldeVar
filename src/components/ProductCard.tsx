@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Heart, ShoppingBag, Leaf, MapPin, Feather, Sparkles, BookOpen } from 'lucide-react';
+import { Heart, ShoppingBag, Leaf, MapPin, Feather, Sparkles, BookOpen, ShieldCheck } from 'lucide-react';
 import { Product } from '../types';
 import { FREE_SHIPPING_THRESHOLD } from '../data/mockData';
 import { ConditionKey, CONDITION_THEMES, resolveConditionKey } from '../utils/conditionTheme';
@@ -126,6 +126,22 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             {product.title}
           </h3>
 
+          {/* Condition Accuracy Badge & Offer note */}
+          <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+            <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/80">
+              <ShieldCheck className="w-2.5 h-2.5 text-emerald-600 shrink-0" />
+              <span>%{product.seller.conditionAccuracyRate || 99} Kondisyon Doğruluğu</span>
+            </span>
+            <span className="text-[9px] font-semibold text-amber-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+              💬 Teklife Açık
+            </span>
+            {product.conditionChecklist?.hasFlaws && (
+              <span className="text-[9px] font-medium text-amber-800 bg-amber-50 px-1 py-0.5 rounded border border-amber-200">
+                Kusur İlanda Belirtildi
+              </span>
+            )}
+          </div>
+
           {/* Evocative Memory Quote */}
           {product.story && (
             <p className="mt-1.5 text-[10px] sm:text-[11px] text-stone-600 italic line-clamp-1 sm:line-clamp-2 leading-relaxed bg-[#FAF8F5] p-1.5 sm:p-2 rounded-lg border border-[#EDE7DD]">
@@ -161,11 +177,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 </span>
               )}
             </div>
-            {isFreeShipping && (
-              <span className="text-[9px] text-emerald-700 font-semibold block truncate">
-                Ücretsiz Kargo
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {isFreeShipping && (
+                <span className="text-[9px] text-emerald-700 font-semibold truncate">
+                  Ücretsiz Kargo
+                </span>
+              )}
+              <span className="text-[9px] text-stone-500 font-medium truncate">
+                • Stok: {product.stock || 1} Adet
               </span>
-            )}
+            </div>
           </div>
 
           <button

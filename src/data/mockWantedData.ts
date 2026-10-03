@@ -91,7 +91,7 @@ export const INITIAL_WANTED_ITEMS: WantedItem[] = [
     eraOrPeriod: "90'lar Orijinal Amerikan Üretim",
     storyWhy: 'Orijinal %100 pamuklu, esnemeyen vintage Amerikan dikim 501 arıyorum. Paçalarında orijinal zincir dikişin durması ve arkasındaki deri etiketin sağlam olması önceliğimdir.',
     sampleImages: [
-      'https://images.unsplash.com/photo-1542272604-780c96856592?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1582552938357-32b906df40cb?w=600&auto=format&fit=crop&q=80',
     ],
     buyer: {
@@ -118,7 +118,7 @@ export const INITIAL_WANTED_ITEMS: WantedItem[] = [
         productCondition: 'Vintage & Karakterli',
         verificationCode: '#EV-419',
         photos: [
-          'https://images.unsplash.com/photo-1542272604-780c96856592?w=600&auto=format&fit=crop&q=80',
+          'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&auto=format&fit=crop&q=80',
         ],
         description: '1995 Texas fabrikası üretimi 501. Paça dikişleri orijinal, ağ kısmında hiçbir aşınma yok. Doğrulama koduyla fotoğrafları ekledim.',
         status: 'pending',
@@ -130,7 +130,7 @@ export const INITIAL_WANTED_ITEMS: WantedItem[] = [
             senderName: 'Cemil Vintage',
             senderRole: 'seller',
             text: 'Merhaba Selin Hanım! Gardırobumda koleksiyon parçası olarak sakladığım 1995 Made in USA W32 L32 mevcut. Tam aradığınız ton yıkama.',
-            photoUrl: 'https://images.unsplash.com/photo-1542272604-780c96856592?w=600&auto=format&fit=crop&q=80',
+            photoUrl: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&auto=format&fit=crop&q=80',
             isOffer: true,
             offerPrice: 1450,
             verificationCode: '#EV-419',

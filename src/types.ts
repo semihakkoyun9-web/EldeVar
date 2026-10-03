@@ -47,6 +47,7 @@ export interface Product {
   categoryLabel: string;
   price: number;
   originalPrice?: number;
+  stock?: number;
   condition: ProductCondition;
   conditionType?: 'yeni_gibi' | 'az_kullanilmis' | 'cok_kullanilmis' | 'vintage';
   brand: string;
@@ -63,6 +64,14 @@ export interface Product {
     rating: number;
     salesCount: number;
     location: string;
+    conditionAccuracyRate?: number; // e.g. 99 (%99 Kondisyon Doğruluk Oranı)
+  };
+  conditionChecklist?: {
+    hasTag?: boolean;
+    hasFlaws?: boolean;
+    flawDetails?: string;
+    isCleanAndOdorFree?: boolean;
+    isRepaired?: boolean;
   };
   isVariable?: boolean;
   variations?: ProductVariation[];
@@ -100,6 +109,8 @@ export interface Coupon {
   description: string;
 }
 
+export type PaymentMethodType = 'bacs' | 'cod' | 'credit_card';
+
 export interface Order {
   id: string;
   orderNumber: string;
@@ -110,13 +121,15 @@ export interface Order {
   shipping: number;
   total: number;
   couponCode?: string;
-  paymentMethod: 'bacs'; // Havale/EFT
-  bankDetails: {
+  paymentMethod: PaymentMethodType; // Havale/EFT, Kapıda Ödeme, Kredi Kartı
+  paymentMethodTitle: string;
+  bankDetails?: {
     bankName: string;
     accountHolder: string;
     iban: string;
     descriptionCode: string;
   };
+  trackingNumber?: string;
   customer: {
     name: string;
     email: string;
@@ -199,4 +212,99 @@ export interface WantedItem {
   views: number;
   createdAt: string;
   offers: WantedOffer[];
+}
+
+export interface ProductOffer {
+  id: string;
+  productId: string;
+  productTitle: string;
+  productImage: string;
+  originalPrice: number;
+  offeredPrice: number;
+  discountPercentage: number;
+  buyerName: string;
+  buyerEmail?: string;
+  message?: string;
+  status: 'pending' | 'accepted' | 'rejected' | 'countered';
+  counterPrice?: number;
+  createdAt: string;
+}
+
+export interface KeepsakeItem {
+  id: string;
+  productId: string;
+  title: string;
+  image: string;
+  brand: string;
+  categoryLabel: string;
+  passportCode?: string;
+  eraOrYear?: string;
+  originCity?: string;
+  travelBadge?: string;
+  sellerFarewell?: string;
+  sellerName: string;
+  acquiredDate: string;
+  buyerPersonalNote?: string;
+}
+
+export interface AuthUser {
+  id: string;
+  name: string;
+  username: string;
+  email: string;
+  avatar: string;
+  phone?: string;
+  city?: string;
+  iban?: string;
+  bio?: string;
+  role: 'seller' | 'buyer' | 'collector';
+  isVerified: boolean;
+  memberSince: string;
+  rating: number;
+  successfulSales: number;
+  availableBalance?: number;
+  pendingBalance?: number;
+}
+
+export const DEFAULT_AUTH_USER: AuthUser = {
+  id: 'usr-semih',
+  name: 'Semih Akkoyun',
+  username: 'semihakkoyun',
+  email: 'semihakkoyun9@gmail.com',
+  avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+  phone: '0532 555 44 33',
+  city: 'Eskişehir / Kadıköy',
+  iban: 'TR12 0001 0090 1234 5678 5001',
+  bio: "90'lar vintage giyim, analog vizörler ve yaşanmışlığı olan eşyalar koleksiyoneri.",
+  role: 'seller',
+  isVerified: true,
+  memberSince: 'Eylül 2024',
+  rating: 4.9,
+  successfulSales: 16,
+  availableBalance: 2420.0,
+  pendingBalance: 570.0,
+};
+
+export interface WordPressSettings {
+  siteUrl?: string;
+  restUrl?: string;
+  nonce?: string;
+  ajaxUrl?: string;
+  siteTitle?: string;
+  siteDescription?: string;
+  themeUrl?: string;
+  currentUser?: {
+    id: number;
+    name: string;
+    email: string;
+    isLoggedIn: boolean;
+    avatar?: string;
+  };
+  isWooCommerceActive?: boolean;
+}
+
+declare global {
+  interface Window {
+    eldevarSettings?: WordPressSettings;
+  }
 }

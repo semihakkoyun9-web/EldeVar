@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Bell, SlidersHorizontal, Plus, Heart, User, X } from 'lucide-react';
-import { ProductCategory, NotificationItem } from '../types';
+import { ProductCategory, NotificationItem, AuthUser } from '../types';
 import { EldeVarSeal } from './EldeVarLogo';
 
 interface TopBarProps {
@@ -16,8 +16,10 @@ interface TopBarProps {
   onOpenSellerModal?: () => void;
   onNavigateFavorites?: () => void;
   onNavigateMenu?: () => void;
+  onOpenMemoryBox?: () => void;
   favoritesCount?: number;
   cartCount?: number;
+  currentUser?: AuthUser | null;
   className?: string;
 }
 
@@ -34,7 +36,9 @@ export const TopBar: React.FC<TopBarProps> = ({
   onOpenSellerModal,
   onNavigateFavorites,
   onNavigateMenu,
+  onOpenMemoryBox,
   favoritesCount = 0,
+  currentUser,
   className = '',
 }) => {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -102,6 +106,18 @@ export const TopBar: React.FC<TopBarProps> = ({
             </button>
           )}
 
+          {/* Keepsake Memory Box Button */}
+          {onOpenMemoryBox && (
+            <button
+              onClick={onOpenMemoryBox}
+              className="p-1.5 sm:p-2 rounded-full bg-[#FAF3EB] hover:bg-[#F3E5D3] border border-[#EBD4BF] text-stone-700 transition-colors shadow-2xs flex items-center justify-center cursor-pointer"
+              title="Eşya Hatıra Kutusu"
+              aria-label="Hatıra Kutusu"
+            >
+              <span className="text-sm">🧳</span>
+            </button>
+          )}
+
           {/* Notifications Button */}
           <div className="relative">
             <button
@@ -160,11 +176,17 @@ export const TopBar: React.FC<TopBarProps> = ({
           {onNavigateMenu && (
             <button
               onClick={onNavigateMenu}
-              className="p-1.5 rounded-full bg-[#FAF3EB] border border-[#EBD7BF] text-[#9E4424] active:scale-95 transition-all"
+              className="p-1 rounded-full bg-[#FAF3EB] border border-[#EBD7BF] text-[#9E4424] active:scale-95 transition-all w-8 h-8 flex items-center justify-center overflow-hidden"
               aria-label="Profil ve Hesabım"
-              title="Hesabım"
+              title={currentUser ? currentUser.name : 'Giriş Yap'}
             >
-              <User className="w-4 h-4" />
+              {currentUser?.avatar ? (
+                <img src={currentUser.avatar} alt="" className="w-full h-full object-cover" />
+              ) : currentUser ? (
+                <span className="font-serif font-bold text-xs">{currentUser.name.charAt(0)}</span>
+              ) : (
+                <User className="w-4 h-4" />
+              )}
             </button>
           )}
         </div>

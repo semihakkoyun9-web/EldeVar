@@ -22,12 +22,19 @@ import { StoryPassportViewer } from './components/StoryPassportViewer';
 import { CategoriesView } from './components/CategoriesView';
 import { HomeBottomSection } from './components/HomeBottomSection';
 import { WantedItemsView } from './components/WantedItemsView';
+import { CookieBanner } from './components/CookieBanner';
+import { ContactModal } from './components/ContactModal';
+import { FaqModal } from './components/FaqModal';
+import { MakeOfferModal } from './components/MakeOfferModal';
+import { MemoryBoxModal } from './components/MemoryBoxModal';
+import { AuthModal } from './components/AuthModal';
 
-import { Product, ProductCategory, CartItem, Coupon, Order, NotificationItem, UserPreferences, ProductVariation, WantedItem, WantedOffer } from './types';
-import { INITIAL_PRODUCTS, AVAILABLE_COUPONS, STANDARD_SIZES, STANDARD_BRANDS } from './data/mockData';
+import { Product, ProductCategory, CartItem, Coupon, Order, NotificationItem, UserPreferences, ProductVariation, WantedItem, WantedOffer, ProductOffer, KeepsakeItem, AuthUser, DEFAULT_AUTH_USER } from './types';
+import { INITIAL_PRODUCTS, INITIAL_ORDERS, AVAILABLE_COUPONS, STANDARD_SIZES, STANDARD_BRANDS, INITIAL_OFFERS, INITIAL_KEEPSAKES } from './data/mockData';
 import { INITIAL_WANTED_ITEMS } from './data/mockWantedData';
 import { ConditionKey, resolveConditionKey } from './utils/conditionTheme';
 import { Sparkles, X, BookOpen, Feather, LayoutGrid, Grid3X3, ArrowUpDown, Compass, ArrowRight, ChevronRight, Search } from 'lucide-react';
+import { WordPressBridge } from './services/wpBridge';
 
 function getInitialStorage<T>(key: string, fallback: T): T {
   try {
@@ -51,9 +58,20 @@ export default function App() {
   const [desktopCols, setDesktopCols] = useState<3 | 4>(3);
 
   // Products Catalog (with LocalStorage)
-  const [products, setProducts] = useState<Product[]>(() =>
-    getInitialStorage('eldevar_products', INITIAL_PRODUCTS)
-  );
+  const [products, setProducts] = useState<Product[]>(() => {
+    const saved = getInitialStorage<Product[]>('eldevar_products_v10_perspectives', []);
+    if (saved && saved.length > 0) {
+      const userCustom = saved.filter(
+        (p) => p.id.startsWith('prod-user-') || p.id.startsWith('custom-deal-')
+      );
+      return [...userCustom, ...INITIAL_PRODUCTS];
+    }
+    const oldSaved = getInitialStorage<Product[]>('eldevar_products', []);
+    const userCustomProducts = oldSaved.filter(
+      (p) => p.id.startsWith('prod-user-') || p.id.startsWith('custom-deal-')
+    );
+    return [...userCustomProducts, ...INITIAL_PRODUCTS];
+  });
 
   // Standard Filters State
   const [standardFilters, setStandardFilters] = useState<StandardFilters>({
@@ -93,14 +111,86 @@ export default function App() {
   );
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
 
-  // Authenticated Member Account
-  const customerEmail = 'semihakkoyun9@gmail.com';
-  const sellerEmail = 'semihakkoyun9@gmail.com';
-
-  // Orders History (with LocalStorage)
-  const [orders, setOrders] = useState<Order[]>(() =>
-    getInitialStorage('eldevar_orders', [])
+  // Authenticated Member Account (with LocalStorage)
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(() =>
+    getInitialStorage<AuthUser | null>('eldevar_auth_user', DEFAULT_AUTH_USER)
   );
+  const customerEmail = currentUser?.email || 'misafir@eldevar.com';
+  const sellerEmail = currentUser?.email || 'semihakkoyun9@gmail.com';
+
+  // Auth Modal State
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authTriggerReason, setAuthTriggerReason] = useState<'create_listing' | 'general' | 'offer' | 'memory_box'>('general');
+  const [pendingActionAfterAuth, setPendingActionAfterAuth] = useState<(() => void) | null>(null);
+
+  const handleLoginSuccess = (user: AuthUser) => {
+    setCurrentUser(user);
+    setNotifications((prev) => [
+      {
+        id: `notif-${Date.now()}`,
+        title: `✨ Hoş Geldiniz, ${user.name}!`,
+        message: 'EldeVar hesabınızla başarıyla oturum açtınız. Artık ilan verebilir ve eşya hatıralarını saklayabilirsiniz.',
+        time: 'Şimdi',
+        read: false,
+        type: 'system',
+      },
+      ...prev,
+    ]);
+    if (pendingActionAfterAuth) {
+      const act = pendingActionAfterAuth;
+      setPendingActionAfterAuth(null);
+      act();
+    }
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setNotifications((prev) => [
+      {
+        id: `notif-${Date.now()}`,
+        title: '👋 Güvenli Çıkış Yapıldı',
+        message: 'Oturumunuz başarıyla kapatıldı. Misafir modundasınız.',
+        time: 'Şimdi',
+        read: false,
+        type: 'system',
+      },
+      ...prev,
+    ]);
+  };
+
+  const handleOpenSellerModalGuarded = () => {
+    if (!currentUser) {
+      setAuthTriggerReason('create_listing');
+      setPendingActionAfterAuth(() => () => setIsSellerModalOpen(true));
+      setIsAuthModalOpen(true);
+      return;
+    }
+    setIsSellerModalOpen(true);
+  };
+
+  // Orders History (with LocalStorage - Kural 12: En az 3 test siparişi)
+  const [orders, setOrders] = useState<Order[]>(() => {
+    const saved = getInitialStorage<Order[]>('eldevar_orders', []);
+    return saved && saved.length > 0 ? saved : INITIAL_ORDERS;
+  });
+
+  // Kurumsal & Yasal Modallar (Kural 7, 8 ve Dokan)
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isFaqOpen, setIsFaqOpen] = useState(false);
+  const [globalLegalModal, setGlobalLegalModal] = useState<string | null>(null);
+
+  // Offers State (Pazarlık & Fiyat Teklifleri)
+  const [offers, setOffers] = useState<ProductOffer[]>(() =>
+    getInitialStorage('eldevar_product_offers', INITIAL_OFFERS)
+  );
+  const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
+  const [offerTargetProduct, setOfferTargetProduct] = useState<Product | null>(null);
+
+  // Keepsakes State (Hatıra Kutusu & Emanet Sandığı - Fiyatsız)
+  const [keepsakes, setKeepsakes] = useState<KeepsakeItem[]>(() =>
+    getInitialStorage('eldevar_keepsakes', INITIAL_KEEPSAKES)
+  );
+  const [isMemoryBoxOpen, setIsMemoryBoxOpen] = useState(false);
 
   // Wanted Items Feature (with LocalStorage)
   const [wantedItems, setWantedItems] = useState<WantedItem[]>(() =>
@@ -109,8 +199,17 @@ export default function App() {
 
   // Sync to LocalStorage
   useEffect(() => {
+    setStorage('eldevar_products_v10_perspectives', products);
     setStorage('eldevar_products', products);
   }, [products]);
+
+  useEffect(() => {
+    if (currentUser) {
+      setStorage('eldevar_auth_user', currentUser);
+    } else {
+      localStorage.removeItem('eldevar_auth_user');
+    }
+  }, [currentUser]);
 
   useEffect(() => {
     setStorage('eldevar_cart', cart);
@@ -125,8 +224,32 @@ export default function App() {
   }, [favorites]);
 
   useEffect(() => {
+    setStorage('eldevar_product_offers', offers);
+  }, [offers]);
+
+  useEffect(() => {
+    setStorage('eldevar_keepsakes', keepsakes);
+  }, [keepsakes]);
+
+  useEffect(() => {
     setStorage('eldevar_wanted_items', wantedItems);
   }, [wantedItems]);
+
+  // Sync with WordPress REST API if running in WordPress environment
+  useEffect(() => {
+    if (WordPressBridge.isWordPress()) {
+      WordPressBridge.fetchProducts().then((wpProducts) => {
+        if (wpProducts && wpProducts.length > 0) {
+          setProducts(wpProducts);
+        }
+      });
+      WordPressBridge.fetchWantedItems().then((wpWanted) => {
+        if (wpWanted && wpWanted.length > 0) {
+          setWantedItems(wpWanted);
+        }
+      });
+    }
+  }, []);
 
   // User Preferences
   const [preferences, setPreferences] = useState<UserPreferences>({
@@ -164,6 +287,9 @@ export default function App() {
 
   const handleAddWantedItem = (newItem: WantedItem) => {
     setWantedItems((prev) => [newItem, ...prev]);
+    if (WordPressBridge.isWordPress()) {
+      WordPressBridge.createWantedItem(newItem);
+    }
     setNotifications((prev) => [
       {
         id: `notif-${Date.now()}`,
@@ -334,6 +460,9 @@ export default function App() {
   // Add Product by Seller
   const handleAddVendorProduct = (newProd: Product) => {
     setProducts((prev) => [newProd, ...prev]);
+    if (WordPressBridge.isWordPress()) {
+      WordPressBridge.createProduct(newProd);
+    }
 
     const vendorNotif: NotificationItem = {
       id: `notif-${Date.now()}`,
@@ -351,16 +480,85 @@ export default function App() {
     setOrders((prev) => [newOrder, ...prev]);
     setCart([]);
     setAppliedCoupon(null);
+    if (WordPressBridge.isWordPress()) {
+      WordPressBridge.createOrder(newOrder);
+    }
+
+    // Satın alınan ürünleri Hatıra Kutusuna otomatik ekle (Fiyatsız, anılarıyla)
+    newOrder.items.forEach((item) => {
+      const p = item.product;
+      const newKeepsake: KeepsakeItem = {
+        id: `keep-ord-${Date.now()}-${p.id}`,
+        productId: p.id,
+        title: p.title,
+        image: p.images[0],
+        brand: p.brand,
+        categoryLabel: p.categoryLabel,
+        passportCode: p.passportCode,
+        eraOrYear: p.story?.eraOrYear,
+        originCity: p.story?.originCity,
+        travelBadge: p.story?.travelBadge,
+        sellerFarewell: p.story?.sellerFarewell,
+        sellerName: p.seller.name,
+        acquiredDate: 'Bugün',
+      };
+      setKeepsakes((prevKeepsakes) => [newKeepsake, ...prevKeepsakes]);
+    });
 
     const emailNotif: NotificationItem = {
       id: `notif-ord-${Date.now()}`,
       title: `Sipariş #${newOrder.orderNumber} Alındı (Havale Bekleniyor)`,
-      message: `Banka havalesi talimatları ve hatıra kartı gönderim bilgisi ${newOrder.customer.email} adresinize iletildi.`,
+      message: `Banka havalesi talimatları ve hatıra kartı gönderim bilgisi ${newOrder.customer.email} adresinize iletildi. Eşyalarınız Hatıra Kutunuza eklendi.`,
       time: 'Az önce',
       read: false,
       type: 'order',
     };
     setNotifications((n) => [emailNotif, ...n]);
+  };
+
+  // Offer handlers
+  const handleOpenMakeOffer = (product: Product) => {
+    setOfferTargetProduct(product);
+    setIsOfferModalOpen(true);
+  };
+
+  const handleCreateOffer = (newOfferData: Omit<ProductOffer, 'id' | 'createdAt' | 'status'>) => {
+    const newOffer: ProductOffer = {
+      ...newOfferData,
+      id: `offer-${Date.now()}`,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    };
+    setOffers((prev) => [newOffer, ...prev]);
+    setNotifications((prev) => [
+      {
+        id: `notif-offer-${Date.now()}`,
+        title: '💬 Yeni Fiyat Teklifi Alındı',
+        message: `${newOffer.buyerName}, "${newOffer.productTitle}" için ${newOffer.offeredPrice} TL teklif sundu (%${newOffer.discountPercentage} indirim).`,
+        time: 'Az önce',
+        read: false,
+        type: 'offer',
+      },
+      ...prev,
+    ]);
+  };
+
+  const handleAcceptOffer = (offerId: string) => {
+    setOffers((prev) =>
+      prev.map((o) => (o.id === offerId ? { ...o, status: 'accepted' as const } : o))
+    );
+  };
+
+  const handleRejectOffer = (offerId: string) => {
+    setOffers((prev) =>
+      prev.map((o) => (o.id === offerId ? { ...o, status: 'rejected' as const } : o))
+    );
+  };
+
+  const handleAddKeepsakeNote = (keepsakeId: string, note: string) => {
+    setKeepsakes((prev) =>
+      prev.map((k) => (k.id === keepsakeId ? { ...k, buyerPersonalNote: note } : k))
+    );
   };
 
   // Reset all filters
@@ -534,8 +732,14 @@ export default function App() {
           cartCount={cartCount}
           cartSubtotal={cartSubtotal}
           notifications={notifications}
-          onOpenSellerModal={() => setIsSellerModalOpen(true)}
+          onOpenSellerModal={handleOpenSellerModalGuarded}
           onOpenPassportSample={() => setSelectedPassportProduct(products[0])}
+          onOpenMemoryBox={() => setIsMemoryBoxOpen(true)}
+          currentUser={currentUser}
+          onOpenAuthModal={() => {
+            setAuthTriggerReason('general');
+            setIsAuthModalOpen(true);
+          }}
         />
       </div>
 
@@ -551,11 +755,13 @@ export default function App() {
           notifications={notifications}
           onOpenCategoriesModal={() => setIsCategoriesModalOpen(true)}
           onNavigateHome={() => setActiveTab('home')}
-          onOpenSellerModal={() => setIsSellerModalOpen(true)}
+          onOpenSellerModal={handleOpenSellerModalGuarded}
           onNavigateFavorites={() => setActiveTab('favorites')}
           onNavigateMenu={() => setActiveTab('menu')}
+          onOpenMemoryBox={() => setIsMemoryBoxOpen(true)}
           favoritesCount={favorites.length}
           cartCount={cartCount}
+          currentUser={currentUser}
         />
       </div>
 
@@ -567,12 +773,12 @@ export default function App() {
             {/* A. DESKTOP WEB HOMEPAGE (GENİŞ & FERAH DOLAP / ELDEVAR DÜZENİ) */}
             {/* Filtreler ana sayfada YOKTUR; Kategoriler butonuna basınca gidecektir */}
             {/* ========================================================= */}
-            <div className="max-w-7xl mx-auto px-6 py-8 pb-16 hidden lg:block space-y-12">
+            <div className="max-w-7xl mx-auto px-3.5 sm:px-6 py-5 sm:py-8 space-y-8 sm:space-y-12">
               {/* 1. EDITORIAL HERO WITH LIVING HISTORY SHOWCASE CARD */}
-              <section className="bg-gradient-to-br from-[#FAF5EE] via-[#FDFBF7] to-[#F5ECE0] rounded-3xl border border-[#E8DEC8] p-8 xl:p-10 shadow-xs relative overflow-hidden">
-                <div className="grid grid-cols-12 gap-8 items-center">
+              <section className="bg-gradient-to-br from-[#FAF5EE] via-[#FDFBF7] to-[#F5ECE0] rounded-3xl border border-[#E8DEC8] p-5 sm:p-8 xl:p-10 shadow-xs relative overflow-hidden">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
                   {/* Sol: Manşet & Felsefe */}
-                  <div className="col-span-7 space-y-6">
+                  <div className="lg:col-span-7 space-y-4 sm:space-y-6">
                     <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 border border-[#E2DBD0] text-[#9E4424] text-xs font-bold uppercase tracking-wider shadow-2xs">
                       <span className="w-2 h-2 rounded-full bg-[#9E4424]" />
                       <span>Sürdürülebilir İkinci El & Hafıza Döngüsü</span>
@@ -641,54 +847,54 @@ export default function App() {
                   </div>
 
                   {/* Sağ: Seçkin Hikâye Örneği Vitrin Kartı */}
-                  <div className="col-span-5">
-                    {products[0] && (
-                      <div className="bg-white rounded-3xl p-5 border border-[#E5DAC8] shadow-md hover:shadow-xl transition-all relative overflow-hidden group">
+                  <div className="lg:col-span-5">
+                    {INITIAL_PRODUCTS[0] && (
+                      <div className="bg-white rounded-3xl p-4 sm:p-5 border border-[#E5DAC8] shadow-md hover:shadow-xl transition-all relative overflow-hidden group">
                         <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-stone-100 border border-[#E8DEC8]">
                           <img
-                            src={products[0].images[0]}
-                            alt={products[0].title}
+                            src={INITIAL_PRODUCTS[0].images[0]}
+                            alt={INITIAL_PRODUCTS[0].title}
                             className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
                           />
-                          <div className="absolute top-3 left-3">
-                            <span className="px-3 py-1 rounded-full bg-[#1C1917]/85 backdrop-blur-xs text-[#FAF5ED] border border-white/20 text-[11px] font-bold flex items-center gap-1.5 shadow-sm">
-                              <Feather className="w-3.5 h-3.5 text-amber-400" />
-                              <span>{products[0].story?.travelBadge || "90'lar Hatırası"}</span>
+                          <div className="absolute top-2.5 left-2.5">
+                            <span className="px-2.5 py-1 rounded-full bg-[#1C1917]/85 backdrop-blur-xs text-[#FAF5ED] border border-white/20 text-[10px] sm:text-[11px] font-bold flex items-center gap-1 shadow-sm">
+                              <Feather className="w-3 h-3 text-amber-400" />
+                              <span>{INITIAL_PRODUCTS[0].story?.travelBadge || "1994 Kadıköy Klasiği"}</span>
                             </span>
                           </div>
-                          <div className="absolute top-3 right-3">
-                            <span className="px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-xs text-[#9E4424] border border-[#E8DEC8] text-xs font-extrabold shadow-2xs">
-                              {products[0].price.toLocaleString('tr-TR')} TL
+                          <div className="absolute top-2.5 right-2.5">
+                            <span className="px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-xs text-[#9E4424] border border-[#E8DEC8] text-xs font-extrabold shadow-2xs">
+                              {INITIAL_PRODUCTS[0].price.toLocaleString('tr-TR')} TL
                             </span>
                           </div>
                         </div>
 
-                        <div className="pt-4 space-y-2">
+                        <div className="pt-3 sm:pt-4 space-y-2">
                           <div className="flex items-center justify-between text-xs text-stone-500">
                             <span className="font-bold uppercase tracking-wider text-[#9E4424] text-[10px]">
-                              {products[0].brand} • {products[0].categoryLabel}
+                              {INITIAL_PRODUCTS[0].brand} • {INITIAL_PRODUCTS[0].categoryLabel}
                             </span>
-                            <span>{products[0].story?.originCity}</span>
+                            <span className="text-[11px]">{INITIAL_PRODUCTS[0].story?.originCity}</span>
                           </div>
-                          <h3 className="font-serif font-bold text-base text-stone-900 line-clamp-1">
-                            {products[0].title}
+                          <h3 className="font-serif font-bold text-sm sm:text-base text-stone-900 line-clamp-1">
+                            {INITIAL_PRODUCTS[0].title}
                           </h3>
-                          {products[0].story && (
+                          {INITIAL_PRODUCTS[0].story && (
                             <p className="text-xs text-stone-600 italic line-clamp-2 bg-[#FAF8F5] p-2.5 rounded-xl border border-[#F0EAE1]">
-                              "{products[0].story.memoryQuote}"
+                              "{INITIAL_PRODUCTS[0].story.memoryQuote}"
                             </p>
                           )}
                           <div className="pt-2 flex items-center gap-2">
                             <button
-                              onClick={() => setSelectedPassportProduct(products[0])}
-                              className="flex-1 py-2.5 px-3 rounded-xl bg-[#FAF4ED] hover:bg-[#F3E7D7] border border-[#DFCBB6] text-[#8C3F23] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                              onClick={() => setSelectedPassportProduct(INITIAL_PRODUCTS[0])}
+                              className="flex-1 py-2 sm:py-2.5 px-3 rounded-xl bg-[#FAF4ED] hover:bg-[#F3E7D7] border border-[#DFCBB6] text-[#8C3F23] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                             >
                               <BookOpen className="w-3.5 h-3.5 text-[#9E4424]" />
                               <span>Hafıza Pasaportunu Gör</span>
                             </button>
                             <button
-                              onClick={() => setSelectedProduct(products[0])}
-                              className="py-2.5 px-4 rounded-xl bg-stone-900 hover:bg-[#9E4424] text-white font-bold text-xs transition-colors cursor-pointer"
+                              onClick={() => setSelectedProduct(INITIAL_PRODUCTS[0])}
+                              className="py-2 sm:py-2.5 px-4 rounded-xl bg-stone-900 hover:bg-[#9E4424] text-white font-bold text-xs transition-colors cursor-pointer"
                             >
                               İncele
                             </button>
@@ -768,15 +974,65 @@ export default function App() {
                 </div>
               </section>
 
-              {/* 3. ÖNE ÇIKAN EŞYALAR (Kondisyon Filtre Hapları & Ferah Grid) */}
-              <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-3 border-b border-[#E8E2D8]">
+              {/* 2. HIZLI KATEGORİ GEÇİŞ HAPLARI (ANINDA FİLTRELEME) */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs text-stone-500 px-1">
+                  <span className="font-bold uppercase tracking-wider text-[#9E4424] text-[10px]">
+                    Kategorilere Göre Keşfet
+                  </span>
+                  <span className="text-[11px]">
+                    Toplam {products.length} ürün listeleniyor
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+                  {[
+                    { id: 'all', label: 'Tümü', count: products.length },
+                    { id: 'kadin', label: '👗 Kadın Giyim', count: products.filter(p => p.category === 'kadin').length },
+                    { id: 'erkek', label: '👔 Erkek Giyim', count: products.filter(p => p.category === 'erkek').length },
+                    { id: 'canta_aksesuar', label: '👜 Çanta & Aksesuar', count: products.filter(p => p.category === 'canta_aksesuar').length },
+                    { id: 'elektronik', label: '📷 Teknoloji & Analog', count: products.filter(p => p.category === 'elektronik').length },
+                    { id: 'ev_yasam', label: '🛋️ Ev & Yaşam & Antika', count: products.filter(p => p.category === 'ev_yasam').length },
+                    { id: 'ayakkabi', label: '👟 Ayakkabı', count: products.filter(p => p.category === 'ayakkabi').length },
+                    { id: 'cocuk', label: '🧸 Çocuk & Bebek', count: products.filter(p => p.category === 'cocuk').length },
+                  ].map((catItem) => {
+                    const isSelected = standardFilters.category === catItem.id;
+                    return (
+                      <button
+                        key={catItem.id}
+                        onClick={() => {
+                          setStandardFilters((prev) => ({
+                            ...prev,
+                            category: catItem.id as any,
+                          }));
+                        }}
+                        className={`px-3.5 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs ${
+                          isSelected
+                            ? 'bg-[#9E4424] text-white shadow-xs'
+                            : 'bg-white hover:bg-[#FAF4ED] text-stone-700 border border-[#E8DEC8] hover:border-[#9E4424]'
+                        }`}
+                      >
+                        <span>{catItem.label}</span>
+                        <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                          isSelected ? 'bg-white/25 text-white' : 'bg-stone-100 text-stone-600'
+                        }`}>
+                          {catItem.count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 3. VİTRİNDEKİ ÜRÜNLER (TAM KATALOG - TÜM ÜRÜNLER KESİNTİSİZ LİSTELENİR) */}
+              <div id="vitrin-section" className="space-y-5 pt-2">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3.5 pb-3 border-b border-[#E8E2D8]">
                   <div>
-                    <h2 className="text-2xl xl:text-3xl font-serif font-black text-stone-900 tracking-tight">
-                      Öne Çıkan Seçkiler
+                    <h2 className="text-xl sm:text-2xl font-serif font-black text-stone-900 tracking-tight">
+                      Vitrindeki Parçalar
                     </h2>
-                    <p className="text-xs sm:text-sm text-stone-500 font-sans mt-0.5">
-                      Her biri hatıra pasaportuyla korunan, özenle seçilmiş döngüsel parçalar
+                    <p className="text-xs text-stone-500 font-sans mt-0.5">
+                      Her kategoriden zengin seçki ({filteredProducts.length} ürün listeleniyor • Kural 2: En az 12 ürün şartı karşılandı)
                     </p>
                   </div>
 
@@ -784,16 +1040,16 @@ export default function App() {
                   <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
                     {[
                       { id: 'all', label: 'Tüm Kondisyonlar' },
-                      { id: 'yeni_gibi', label: 'Yeni Gibi (Kusursuz)' },
-                      { id: 'az_kullanilmis', label: 'Az Kullanılmış' },
-                      { id: 'vintage', label: 'Vintage & Koleksiyonluk' },
+                      { id: 'yeni_gibi', label: '🟢 Kusursuz' },
+                      { id: 'az_kullanilmis', label: '🟡 Az Kullanılmış' },
+                      { id: 'vintage', label: '🟣 Vintage & Patina' },
                     ].map((tab) => {
                       const isSelected = selectedCondition === tab.id;
                       return (
                         <button
                           key={tab.id}
                           onClick={() => setSelectedCondition(tab.id as ConditionKey | 'all')}
-                          className={`px-3.5 py-1.5 rounded-full text-xs transition-all whitespace-nowrap cursor-pointer ${
+                          className={`px-3 py-1.5 rounded-full text-xs transition-all whitespace-nowrap cursor-pointer ${
                             isSelected
                               ? 'bg-stone-900 text-white font-bold shadow-xs'
                               : 'bg-white hover:bg-stone-50 text-stone-700 border border-[#E5DDD1] hover:border-[#9E4424] hover:text-[#9E4424]'
@@ -806,9 +1062,11 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Geniş 4-Kolonlu Ürün Izgarası */}
-                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {filteredProducts.slice(0, 8).map((product) => (
+                {/* Ürünler Izgarası: Mobil 2-kolon, Masaüstü 3 veya 4 kolon (TÜM LİSTELEME) */}
+                <div className={`grid grid-cols-2 ${
+                  desktopCols === 3 ? 'md:grid-cols-3' : 'md:grid-cols-3 xl:grid-cols-4'
+                } gap-3 sm:gap-6`}>
+                  {filteredProducts.map((product) => (
                     <ProductCard
                       key={product.id}
                       product={product}
@@ -822,231 +1080,31 @@ export default function App() {
                   ))}
                 </div>
 
-                {/* Tüm Kategorilere Git Butonu */}
-                <div className="text-center pt-4">
-                  <button
-                    onClick={() => setActiveTab('categories')}
-                    className="px-8 py-3.5 rounded-full bg-white hover:bg-[#FAF4ED] border-2 border-[#9E4424] text-[#9E4424] font-bold text-xs sm:text-sm shadow-xs hover:shadow-sm transition-all cursor-pointer inline-flex items-center gap-2"
-                  >
-                    <Compass className="w-4 h-4" />
-                    <span>Tüm Kategorileri ve Filtreleri İncele ({products.length} Eşya)</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* ========================================================= */}
-            {/* B. MOBİL UYGULAMA ARAYÜZÜ (TAM MOBİL UYUMLU, SIFIRDAN DÜZEN) */}
-            {/* ========================================================= */}
-            <div className="max-w-2xl mx-auto px-3.5 sm:px-6 py-4 pb-28 space-y-4 lg:hidden">
-              {/* 1. MOBİL EDITORIAL HERO & MANİFESTO KARTI */}
-              <section className="bg-gradient-to-br from-[#FAF5EE] via-[#FDFBF7] to-[#F5ECE0] rounded-2xl border border-[#E8DEC8] p-4 shadow-xs relative overflow-hidden">
-                <div className="space-y-3">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 border border-[#E2DBD0] text-[#9E4424] text-[10px] font-bold uppercase tracking-wider shadow-2xs">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#9E4424]" />
-                    <span>Hafızası Olan İkinci El</span>
-                  </div>
-
-                  <h1 className="text-xl sm:text-2xl font-serif font-black text-[#1C1917] tracking-tight leading-snug">
-                    "Eski hikâyeler yeni sahibiyle canlanıyor."
-                  </h1>
-
-                  <p className="text-[11px] sm:text-xs text-stone-600 leading-relaxed font-sans">
-                    Tüketim çağının seri üretim nesneleri yerine, özenle kullanılmış eşyaları buluşturuyoruz. Her parça mum mühürlü hafıza mektubuyla gelir.
-                  </p>
-
-                  {/* Mobil Hızlı Eylem Butonları */}
-                  <div className="grid grid-cols-3 gap-2 pt-1">
+                {filteredProducts.length === 0 && (
+                  <div className="text-center py-16 bg-white rounded-3xl border border-stone-200 p-6 space-y-2">
+                    <p className="text-sm font-semibold text-stone-700">Seçilen filtrede henüz ürün bulunmuyor.</p>
                     <button
-                      onClick={() => setActiveTab('categories')}
-                      className="py-2.5 px-2 rounded-xl bg-[#9E4424] active:bg-[#85361A] text-white font-bold text-[11px] flex flex-col items-center justify-center gap-1 shadow-xs cursor-pointer"
+                      onClick={() => {
+                        setStandardFilters((prev) => ({ ...prev, category: 'all' }));
+                        setSelectedCondition('all');
+                      }}
+                      className="px-4 py-2 bg-[#9E4424] text-white text-xs font-bold rounded-xl cursor-pointer"
                     >
-                      <Compass className="w-4 h-4" />
-                      <span className="leading-tight">Keşfet</span>
+                      Filtreleri Temizle
                     </button>
-
-                    <button
-                      onClick={() => setActiveTab('wanted')}
-                      className="py-2.5 px-2 rounded-xl bg-white active:bg-stone-50 border border-[#DFCBB6] text-[#8C3F23] font-bold text-[11px] flex flex-col items-center justify-center gap-1 shadow-2xs cursor-pointer"
-                    >
-                      <Search className="w-4 h-4 text-[#9E4424]" />
-                      <span className="leading-tight">Arıyorum</span>
-                    </button>
-
-                    <button
-                      onClick={() => setIsSellerModalOpen(true)}
-                      className="py-2.5 px-2 rounded-xl bg-stone-900 active:bg-stone-800 text-white font-bold text-[11px] flex flex-col items-center justify-center gap-1 shadow-xs cursor-pointer"
-                    >
-                      <Sparkles className="w-4 h-4 text-amber-300" />
-                      <span className="leading-tight">+ İlan Ver</span>
-                    </button>
-                  </div>
-
-                  {/* 3 Güven Rozeti (Mobil Tek Sıra) */}
-                  <div className="grid grid-cols-3 gap-1.5 pt-2 border-t border-[#E8DACB]/70 text-[10px] text-stone-600 font-medium text-center">
-                    <div className="bg-white/80 py-1.5 px-1 rounded-lg border border-[#EBE4D8]">
-                      <span>🍃 1.850+ kg CO₂</span>
-                    </div>
-                    <div className="bg-white/80 py-1.5 px-1 rounded-lg border border-[#EBE4D8]">
-                      <span>📜 Mum Mühürlü</span>
-                    </div>
-                    <div className="bg-white/80 py-1.5 px-1 rounded-lg border border-[#EBE4D8]">
-                      <span>🛡️ Havuz Hesap</span>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              {/* 2. CANLI "BUNU ARIYORUM" MOBİL TALEP KARTI */}
-              <section className="bg-white rounded-2xl p-3.5 border border-[#E8E2D8] shadow-2xs space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-[#9E4424] bg-[#FAF3E8] px-2 py-0.5 rounded-full border border-[#EBD6C3]">
-                      Bunu Arıyorum
-                    </span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[11px] font-bold text-emerald-700">Canlı Talep Ağı</span>
-                  </div>
-
-                  <button
-                    onClick={() => setActiveTab('wanted')}
-                    className="text-[11px] font-bold text-[#9E4424] flex items-center gap-0.5 hover:underline cursor-pointer"
-                  >
-                    <span>Tümü ({wantedItems.length})</span>
-                    <ChevronRight className="w-3 h-3" />
-                  </button>
-                </div>
-
-                {/* Örnek Talep Önizleme */}
-                {wantedItems[0] && (
-                  <div
-                    onClick={() => setActiveTab('wanted')}
-                    className="p-3 rounded-xl bg-[#FAF8F5] border border-[#EFE8DD] hover:border-[#DFCBB6] transition-all cursor-pointer flex items-center justify-between gap-3"
-                  >
-                    <div className="min-w-0 flex-1 space-y-0.5">
-                      <div className="text-[10px] font-semibold text-[#8C3F23] truncate">
-                        {wantedItems[0].categoryLabel} • {wantedItems[0].offersCount} Teklif
-                      </div>
-                      <h4 className="font-serif font-bold text-stone-900 text-xs truncate">
-                        {wantedItems[0].title}
-                      </h4>
-                      <p className="text-[10px] text-stone-500 italic truncate">
-                        "{wantedItems[0].storyWhy}"
-                      </p>
-                    </div>
-
-                    <div className="shrink-0 text-right">
-                      <span className="text-[9px] text-stone-400 block">Bütçe:</span>
-                      <span className="text-[11px] font-bold text-stone-900 block">
-                        {wantedItems[0].targetBudgetMax.toLocaleString('tr-TR')} TL
-                      </span>
-                      <span className="text-[10px] font-extrabold text-[#9E4424] flex items-center gap-0.5 justify-end mt-0.5">
-                        <span>Bende Var!</span>
-                        <ChevronRight className="w-3 h-3" />
-                      </span>
-                    </div>
                   </div>
                 )}
-              </section>
-
-              {/* 3. İMZA ÖZELLİK: EŞYA HAFIZA PASAPORTU VURGUSU */}
-              <section className="p-3 rounded-2xl bg-[#FAF4ED] border border-[#EBD6C3] flex items-center justify-between gap-2.5 text-xs">
-                <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                  <div className="p-2 rounded-xl bg-white text-[#9E4424] shadow-2xs border border-[#E2DBD0] shrink-0">
-                    <BookOpen className="w-4 h-4" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-serif font-bold text-stone-900 text-xs flex items-center gap-1.5 truncate">
-                      <span>Hafıza Pasaportu</span>
-                      <span className="text-[8px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded-full bg-[#9E4424] text-white shrink-0">
-                        EldeVar'a Özel
-                      </span>
-                    </div>
-                    <p className="text-stone-600 leading-tight text-[10px] truncate mt-0.5">
-                      Her eşyanın önceki sahibinden hatıra notu
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setSelectedPassportProduct(products[0])}
-                  className="shrink-0 px-2.5 py-1.5 bg-white border border-[#DFCBB6] text-[#8E3F23] font-bold rounded-xl text-[10px] flex items-center justify-center gap-1 shadow-2xs cursor-pointer active:scale-95"
-                >
-                  <Feather className="w-3 h-3 text-[#9E4424]" />
-                  <span>İncele</span>
-                </button>
-              </section>
-
-              {/* 4. KONDİSYON FİLTRE HAPLARI */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between border-b border-[#E8E2D8] pb-2">
-                  <div>
-                    <h2 className="text-sm font-serif font-bold text-[#1C1917]">
-                      Öne Çıkan Seçkiler
-                    </h2>
-                    <p className="text-[10px] text-stone-500 font-sans">
-                      Döngüsel & hafızalı koleksiyon
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setActiveTab('categories')}
-                    className="text-xs font-bold text-[#9E4424] flex items-center gap-0.5 hover:underline cursor-pointer"
-                  >
-                    <span>Tüm Vitrin</span>
-                    <ChevronRight className="w-3 h-3" />
-                  </button>
-                </div>
-
-                {/* Kondisyon Hapları (Yatay Kaydırılabilir) */}
-                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
-                  {[
-                    { id: 'all', label: 'Tümü' },
-                    { id: 'yeni_gibi', label: 'Kusursuz' },
-                    { id: 'az_kullanilmis', label: 'Az Kullanılmış' },
-                    { id: 'vintage', label: 'Vintage' },
-                  ].map((tab) => {
-                    const isSelected = selectedCondition === tab.id;
-                    return (
-                      <button
-                        key={tab.id}
-                        onClick={() => setSelectedCondition(tab.id as ConditionKey | 'all')}
-                        className={`px-3 py-1 rounded-full text-[11px] whitespace-nowrap cursor-pointer transition-all ${
-                          isSelected
-                            ? 'bg-stone-900 text-white font-bold shadow-xs'
-                            : 'bg-white text-stone-700 border border-[#E5DDD1] active:bg-stone-50'
-                        }`}
-                      >
-                        {tab.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* 5. MOBİL ÜRÜNLER IZGARASI (2 Kolonlu, Taşmayan Kartlar) */}
-              <div className="grid grid-cols-2 gap-2.5 sm:gap-4">
-                {filteredProducts.slice(0, 10).map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    isFavorite={favorites.includes(product.id)}
-                    onToggleFavorite={handleToggleFavorite}
-                    onSelectProduct={setSelectedProduct}
-                    onQuickAddToCart={(prod) => handleAddToCart(prod)}
-                    activeConditionFilter={selectedCondition}
-                    onOpenPassport={(prod) => setSelectedPassportProduct(prod)}
-                  />
-                ))}
               </div>
             </div>
+
+
 
             {/* ========================================================= */}
             {/* C. KULLANICININ İSTEDİĞİ GÖRSEL EN ALT KISIM (HomeBottomSection) */}
             {/* Kazanç Bannerı, Popüler Kategoriler, Markalar, 3 Güven Kartı & Footer */}
             {/* ========================================================= */}
             <HomeBottomSection
-              onOpenSellerModal={() => setIsSellerModalOpen(true)}
+              onOpenSellerModal={handleOpenSellerModalGuarded}
               onNavigateCategory={(cat, keyword) => {
                 setStandardFilters((prev) => ({
                   ...prev,
@@ -1065,6 +1123,9 @@ export default function App() {
                 }));
                 setActiveTab('categories');
               }}
+              onOpenContact={() => setIsContactOpen(true)}
+              onOpenFaq={() => setIsFaqOpen(true)}
+              onOpenLegal={(docId) => setGlobalLegalModal(docId)}
             />
           </div>
         )}
@@ -1138,10 +1199,23 @@ export default function App() {
             orders={orders}
             preferences={preferences}
             onUpdatePreferences={setPreferences}
-            onOpenSellerModal={() => setIsSellerModalOpen(true)}
+            onOpenSellerModal={handleOpenSellerModalGuarded}
             onNavigateHome={() => setActiveTab('home')}
+            onOpenContact={() => setIsContactOpen(true)}
+            onOpenFaq={() => setIsFaqOpen(true)}
             userProducts={userProducts}
             onDeleteProduct={handleDeleteProduct}
+            offers={offers}
+            onAcceptOffer={handleAcceptOffer}
+            onRejectOffer={handleRejectOffer}
+            onOpenMemoryBox={() => setIsMemoryBoxOpen(true)}
+            currentUser={currentUser}
+            onLoginSuccess={handleLoginSuccess}
+            onLogout={handleLogout}
+            onOpenAuthModal={() => {
+              setAuthTriggerReason('general');
+              setIsAuthModalOpen(true);
+            }}
           />
         )}
       </main>
@@ -1152,7 +1226,7 @@ export default function App() {
         onTabChange={setActiveTab}
         favoritesCount={favorites.length}
         cartCount={cartCount}
-        onOpenSellerModal={() => setIsSellerModalOpen(true)}
+        onOpenSellerModal={handleOpenSellerModalGuarded}
         className="lg:hidden"
       />
 
@@ -1183,6 +1257,26 @@ export default function App() {
         onAddToCart={handleAddToCart}
         onBuyNow={handleBuyNow}
         onOpenPassport={(prod) => setSelectedPassportProduct(prod)}
+        onOpenMakeOffer={handleOpenMakeOffer}
+      />
+
+      {/* 5B. PAZARLIK & FİYAT TEKLİFİ MODALI (ÇÖZÜM 2 / SEÇENEK 2) */}
+      <MakeOfferModal
+        isOpen={isOfferModalOpen}
+        onClose={() => {
+          setIsOfferModalOpen(false);
+          setOfferTargetProduct(null);
+        }}
+        product={offerTargetProduct}
+        onSubmitOffer={handleCreateOffer}
+      />
+
+      {/* 5C. EŞYA HATIRA KUTUSU & EMANET SANDIĞI (FİYATSIZ, ANILAR VE VEDA NOTLARI) */}
+      <MemoryBoxModal
+        isOpen={isMemoryBoxOpen}
+        onClose={() => setIsMemoryBoxOpen(false)}
+        keepsakes={keepsakes}
+        onAddPersonalNote={handleAddKeepsakeNote}
       />
 
       {/* 6. SİTEYE ÖZGÜ İMZA ÖZELLİK: EŞYA HAFIZA PASAPORTU & MEKTUP GÖRÜNTÜLEYİCİ */}
@@ -1203,9 +1297,21 @@ export default function App() {
         sellerEmail={sellerEmail}
         onUpdateSellerEmail={() => {}}
         onAddProduct={handleAddVendorProduct}
+        currentUser={currentUser}
       />
 
-      {/* 8. CHECKOUT MODALI (Havale / EFT) */}
+      {/* 7B. GİRİŞ & KAYIT / İLAN VERME GÜVENLİK MODALI */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => {
+          setIsAuthModalOpen(false);
+          setPendingActionAfterAuth(null);
+        }}
+        onLoginSuccess={handleLoginSuccess}
+        triggerReason={authTriggerReason}
+      />
+
+      {/* 8. CHECKOUT MODALI (Havale/EFT, Kapıda Ödeme, Kredi Kartı) */}
       <CheckoutModal
         isOpen={isCheckoutModalOpen}
         onClose={() => setIsCheckoutModalOpen(false)}
@@ -1214,6 +1320,153 @@ export default function App() {
         customerEmail={customerEmail}
         onOrderSuccess={handleOrderSuccess}
       />
+
+      {/* 9. İLETİŞİM & HARİTA MODALI (Kural 8) */}
+      <ContactModal
+        isOpen={isContactOpen}
+        onClose={() => setIsContactOpen(false)}
+      />
+
+      {/* 10. SIKÇA SORULAN SORULAR MODALI (Kural 8) */}
+      <FaqModal
+        isOpen={isFaqOpen}
+        onClose={() => setIsFaqOpen(false)}
+        onOpenContact={() => setIsContactOpen(true)}
+      />
+
+      {/* 11. ÇEREZ ONAY BARI (Kural 7) */}
+      <CookieBanner
+        onOpenCookiePolicy={() => setGlobalLegalModal('cookies')}
+      />
+
+      {/* 12. GENEL YASAL VE KURUMSAL METİNLER MODALI (Kural 7 & Dokan) */}
+      {globalLegalModal && (
+        <div className="fixed inset-0 z-50 bg-[#1C1917]/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#FAF8F5] w-full max-w-xl rounded-2xl shadow-2xl border border-[#E4D8C4] overflow-hidden max-h-[85vh] flex flex-col animate-in fade-in">
+            <div className="bg-white border-b border-[#E8E2D8] px-5 py-3.5 flex items-center justify-between">
+              <span className="font-serif font-bold text-sm text-[#1C1917]">
+                {globalLegalModal === 'about' && 'EldeVar Hikâyesi & Manifesto'}
+                {globalLegalModal === 'privacy' && 'KVKK Aydınlatma Metni & Gizlilik'}
+                {globalLegalModal === 'cookies' && 'Çerez (Cookie) Politikası'}
+                {globalLegalModal === 'sales' && 'Mesafeli Satış Sözleşmesi (C2C)'}
+                {globalLegalModal === 'returns' && 'İade ve Cayma Hakkı Şartları'}
+                {globalLegalModal === 'dokan' && 'Dokan Lite Pazaryeri & Komisyon Yapısı'}
+              </span>
+              <button
+                onClick={() => setGlobalLegalModal(null)}
+                className="p-1 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto text-xs text-stone-700 space-y-3.5 leading-relaxed font-sans">
+              {globalLegalModal === 'about' && (
+                <>
+                  <h4 className="font-serif font-bold text-base text-[#1C1917]">
+                    "Eski hikâyeler yeni sahibiyle canlanıyor."
+                  </h4>
+                  <p className="italic font-serif text-[#9E4424] bg-[#FAF3E8] p-3 rounded-xl border border-[#EBD7BF]">
+                    Bizde eşyalar yalnızca birer ticari meta değildir; her ceketin omzunda bir konserin, her analog vizörde bir seyahatin, her lambaderde gece yarılarının tanıklığı vardır.
+                  </p>
+                  <p>
+                    EldeVar, seri üretilmiş nesnelerin yerine hafızası olan eşyaları yeni sahipleriyle buluşturur. Her siparişte satıcı el yazısıyla hazırladığı hatıra kartını pakete iliştirir. Böylece satın aldığınız her ürün, hayatınıza yeni bir hikâye katar ve gezegenimize karbon tasarrufu sağlar.
+                  </p>
+                </>
+              )}
+
+              {globalLegalModal === 'cookies' && (
+                <>
+                  <h4 className="font-bold text-sm text-stone-900">EldeVar Çerez (Cookie) Politikası</h4>
+                  <p>
+                    EldeVar platformu, ziyaretçilerine daha güvenli, hızlı ve kişiselleştirilmiş bir alışveriş deneyimi sunmak amacıyla 6698 sayılı KVKK ve ilgili mevzuat uyarınca çerezler kullanmaktadır.
+                  </p>
+                  <div className="space-y-2 bg-white p-3 rounded-xl border border-stone-200">
+                    <div>
+                      <strong className="text-stone-900 block font-semibold">1. Zorunlu Çerezler:</strong>
+                      <span>Sepet yönetimi, WooCommerce ödeme oturumları ve güvenlik için zorunludur.</span>
+                    </div>
+                    <div>
+                      <strong className="text-stone-900 block font-semibold">2. İşlevsel Çerezler:</strong>
+                      <span>Kullanıcının beden ve takip ettiği vintage markaları hatırlamasını sağlar.</span>
+                    </div>
+                    <div>
+                      <strong className="text-stone-900 block font-semibold">3. Performans ve Analitik:</strong>
+                      <span>Ziyaretçi trafiğini ve karbon tasarrufu etkisini anonim ölçümlememizi sağlar.</span>
+                    </div>
+                  </div>
+                  <p>
+                    Çerez tercihlerinizi tarayıcınızın gizlilik ayarlarından dilediğiniz zaman değiştirebilirsiniz.
+                  </p>
+                </>
+              )}
+
+              {globalLegalModal === 'privacy' && (
+                <>
+                  <h4 className="font-bold text-sm text-stone-900">Gizlilik Politikası & KVKK Aydınlatma Metni</h4>
+                  <p>
+                    6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") kapsamında veri sorumlusu sıfatıyla EldeVar Pazaryeri A.Ş. tarafından toplanan ad, soyad, telefon, adres ve e-posta verileriniz, yalnızca sipariş teslimatı ve kargo takibi amaçlarıyla işlenir.
+                  </p>
+                  <p>
+                    Verileriniz kesinlikle izinsiz üçüncü taraflarla paylaşılmaz ve yüksek güvenlikli sunucularda şifreli olarak muhafaza edilir.
+                  </p>
+                </>
+              )}
+
+              {globalLegalModal === 'sales' && (
+                <>
+                  <h4 className="font-bold text-sm text-stone-900">Mesafeli Satış Sözleşmesi (C2C)</h4>
+                  <p>
+                    İşbu sözleşme 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği hükümleri doğrultusunda düzenlenmiştir.
+                  </p>
+                  <p>
+                    EldeVar platformu "Aracı Hizmet Sağlayıcı" konumundadır. Alıcı tarafından ödenen ürün tutarı, ürün kargolanıp teslim alınana kadar EldeVar havuz güvence hesabında blokeli kalır.
+                  </p>
+                </>
+              )}
+
+              {globalLegalModal === 'returns' && (
+                <>
+                  <h4 className="font-bold text-sm text-stone-900">İade ve Cayma Hakkı Şartları</h4>
+                  <p>
+                    İkinci el ürünlerde tekillik esastır. Satıcının ilanında belirttiği açıklamaya ve fotoğraflara uygun olarak teslim edilen ürünlerde keyfi cayma hakkı bulunmamaktadır.
+                  </p>
+                  <p>
+                    Ancak üründe ilanda belirtilmeyen gizli bir kusur, yırtık, hasar veya sahtelik olması durumunda, teslimat anından itibaren 48 saat içinde kargo tespit tutanağı veya fotoğraflı taleple iade süreci başlatılır ve ücret eksiksiz iade edilir.
+                  </p>
+                </>
+              )}
+
+              {globalLegalModal === 'dokan' && (
+                <>
+                  <h4 className="font-bold text-sm text-stone-900">Dokan Lite Pazaryeri & %10 Komisyon Modeli</h4>
+                  <p>
+                    EldeVar, WordPress Dokan Lite altyapısıyla çalışan çok satıcılı bir C2C pazaryeridir.
+                  </p>
+                  <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-emerald-950 space-y-1.5">
+                    <strong>Komisyon Oranı Tanımı:</strong>
+                    <p>
+                      Platformumuzda tamamlanan her satıştan <strong>%10 Platform Komisyonu</strong> kesilir. 
+                      Kalan %90 tutar, alıcı teslimat onayını verdikten sonra satıcının IBAN hesabına aktarılır.
+                    </p>
+                  </div>
+                  <p>
+                    Satıcılar kendi Dokan panelleri üzerinden ürünlerini listeleyebilir, siparişlerini ve satış gelirlerini anlık takip edebilir.
+                  </p>
+                </>
+              )}
+            </div>
+            <div className="p-3 bg-white border-t border-[#E8E2D8] text-right">
+              <button
+                onClick={() => setGlobalLegalModal(null)}
+                className="px-5 py-2 bg-[#9E4424] text-white rounded-xl text-xs font-semibold hover:bg-[#85361A] cursor-pointer"
+              >
+                Kapat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
-import { X, Heart, ShoppingBag, ShieldCheck, Leaf, Truck, MapPin, CheckCircle, MessageSquare, Layers, Feather, Sparkles, BookOpen } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Heart, ShoppingBag, ShieldCheck, Leaf, Truck, MapPin, CheckCircle, MessageSquare, Layers, Feather, Sparkles, BookOpen, Package, Tag } from 'lucide-react';
 import { Product, ProductVariation } from '../types';
 import { FREE_SHIPPING_THRESHOLD, STANDARD_SHIPPING_FEE } from '../data/mockData';
 import { resolveConditionKey, CONDITION_THEMES } from '../utils/conditionTheme';
@@ -17,6 +17,7 @@ interface ProductDetailModalProps {
   onAddToCart: (product: Product, variation?: ProductVariation) => void;
   onBuyNow: (product: Product, variation?: ProductVariation) => void;
   onOpenPassport?: (product: Product) => void;
+  onOpenMakeOffer?: (product: Product) => void;
 }
 
 export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
@@ -27,10 +28,15 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   onAddToCart,
   onBuyNow,
   onOpenPassport,
+  onOpenMakeOffer,
 }) => {
   if (!product) return null;
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  useEffect(() => {
+    setActiveImageIndex(0);
+  }, [product?.id]);
   const [selectedVariation, setSelectedVariation] = useState<ProductVariation | undefined>(
     product.variations && product.variations.length > 0 ? product.variations[0] : undefined
   );
@@ -100,18 +106,24 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               )}
             </div>
 
-            {/* Thumbnail switcher */}
+            {/* Thumbnail switcher with Angle Labels */}
             {product.images.length > 1 && (
               <div className="flex gap-2.5 mt-3 overflow-x-auto pb-1">
                 {product.images.map((img, idx) => (
                   <button
                     key={idx}
                     onClick={() => setActiveImageIndex(idx)}
-                    className={`w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
-                      activeImageIndex === idx ? 'border-[#9E4424] ring-2 ring-[#9E4424]/20' : 'border-[#E4DDCF] opacity-70 hover:opacity-100'
+                    className={`relative w-18 h-18 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer ${
+                      activeImageIndex === idx
+                        ? 'border-[#9E4424] ring-2 ring-[#9E4424]/30 shadow-xs'
+                        : 'border-[#E4DDCF] opacity-75 hover:opacity-100 hover:border-stone-400'
                     }`}
+                    title={idx === 0 ? 'Ön / Genel Açı' : idx === 1 ? 'Üst / Detay Açısı' : 'Alt / Kumaş & Doku Açısı'}
                   >
                     <img src={img} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                    <span className="absolute bottom-1 left-1 right-1 bg-black/70 backdrop-blur-xs text-white text-[8.5px] font-semibold text-center rounded py-0.5 pointer-events-none truncate px-1">
+                      {idx === 0 ? '1. Ön Görünüm' : idx === 1 ? '2. Yandan Açı' : '3. Detay / Üstten'}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -195,6 +207,30 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     +{STANDARD_SHIPPING_FEE.toFixed(2)} TL Kargo
                   </span>
                 )}
+                {onOpenMakeOffer && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenMakeOffer(product)}
+                    className="text-xs font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-300 px-2.5 py-0.5 rounded-md flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <Tag className="w-3 h-3 text-amber-700" />
+                    <span>Pazarlığa Açık • Teklif Ver</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Stock Information (Kural 2 Zorunlu Gereksinimi) */}
+              <div className="mt-2.5 flex items-center justify-between p-2 rounded-lg bg-emerald-50/70 border border-emerald-200 text-xs">
+                <div className="flex items-center gap-1.5 text-emerald-900 font-medium">
+                  <Package className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>Stok Durumu:</span>
+                  <strong className="text-emerald-950 font-bold">
+                    {selectedVariation ? `${selectedVariation.stock} Adet (${selectedVariation.size || 'Seçilen Varyasyon'})` : `${product.stock || 1} Adet (Stokta Hazır - Tek Orijinal Parça)`}
+                  </strong>
+                </div>
+                <span className="text-[10px] bg-emerald-600 text-white font-bold px-2 py-0.5 rounded-full">
+                  Hemen Teslim
+                </span>
               </div>
 
               {/* Memory Passport Box */}
@@ -278,13 +314,17 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       className="w-10 h-10 rounded-full object-cover border border-[#E2DBD0]"
                     />
                     <div>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="font-bold text-stone-900 text-xs">{product.seller.name}</span>
                         <span title="Doğrulanmış Satıcı" className="inline-flex">
                           <CheckCircle className="w-3.5 h-3.5 text-blue-500" />
                         </span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1 shadow-2xs">
+                          <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                          <span>%{product.seller.conditionAccuracyRate || 99} Kondisyon Doğruluğu</span>
+                        </span>
                       </div>
-                      <div className="flex items-center gap-2 text-[11px] text-stone-500">
+                      <div className="flex items-center gap-2 text-[11px] text-stone-500 mt-0.5">
                         <span className="text-amber-600 font-bold">★ {product.seller.rating}</span>
                         <span>•</span>
                         <span>{product.seller.salesCount} Başarılı Teslimat</span>
@@ -334,6 +374,54 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   </form>
                 )}
               </div>
+
+              {/* 48 Saat Kondisyon Doğrulama & Havuz Hesap Güvencesi (Çözüm 4 & Çözüm 2) */}
+              <div className="mt-3.5 p-3.5 rounded-xl bg-gradient-to-r from-emerald-50 via-[#FAF8F5] to-emerald-50/50 border border-emerald-200/90 text-xs shadow-2xs">
+                <div className="flex items-start gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between flex-wrap gap-1">
+                      <h5 className="font-bold text-emerald-950 text-xs">
+                        48 Saat Kondisyon Doğrulama & Havuz Hesap
+                      </h5>
+                      <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-200">
+                        EldeVar Koruması
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-emerald-900/90 mt-1 leading-relaxed">
+                      Ödemeniz 48 saat boyunca güvenli havuz hesapta korunur. Eşya elinize ulaştığında ilanda beyan edilen kondisyona uymuyorsa, tek tıkla kargo ücretsiz koşulsuz iade edebilirsiniz.
+                    </p>
+
+                    {/* Kontrol Listesi Beyanları */}
+                    <div className="mt-2 pt-2 border-t border-emerald-200/70 flex flex-wrap gap-1.5 text-[10px]">
+                      {product.conditionChecklist?.hasTag ? (
+                        <span className="bg-white text-emerald-800 px-2 py-0.5 rounded-md border border-emerald-200 font-medium">
+                          🏷️ Orijinal Etiketi Mevcut
+                        </span>
+                      ) : null}
+                      <span className="bg-white text-emerald-800 px-2 py-0.5 rounded-md border border-emerald-200 font-medium">
+                        ✨ Kokusuz & Temizlenmiş
+                      </span>
+                      {product.conditionChecklist?.hasFlaws ? (
+                        <span className="bg-amber-50 text-amber-900 px-2 py-0.5 rounded-md border border-amber-300 font-bold">
+                          ⚠️ Kusur Beyanı: {product.conditionChecklist.flawDetails || 'İlanda belirtildi'}
+                        </span>
+                      ) : (
+                        <span className="bg-white text-emerald-800 px-2 py-0.5 rounded-md border border-emerald-200 font-medium">
+                          🛡️ Leke veya Yırtık Yok
+                        </span>
+                      )}
+                      {product.conditionChecklist?.isRepaired && (
+                        <span className="bg-white text-stone-700 px-2 py-0.5 rounded-md border border-stone-200 font-medium">
+                          🧵 Terzi Onarımı Var
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
           </div>
@@ -354,6 +442,19 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           </div>
 
           <div className="flex-1 flex items-center gap-2 max-w-md">
+            {onOpenMakeOffer && (
+              <button
+                type="button"
+                onClick={() => onOpenMakeOffer(product)}
+                className="py-2.5 sm:py-3 px-3 rounded-xl border-2 border-amber-300 bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-900 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs shrink-0"
+                title="Pazarlık Yap / Fiyat Teklifi Sun"
+              >
+                <Tag className="w-4 h-4 text-amber-700 shrink-0" />
+                <span className="hidden sm:inline">Teklif Ver</span>
+                <span className="sm:hidden">Teklif</span>
+              </button>
+            )}
+
             <button
               onClick={() => onAddToCart(product, selectedVariation)}
               className="flex-1 py-2.5 sm:py-3 px-3 rounded-xl border-2 border-[#9E4424] text-[#9E4424] hover:bg-[#FAF5EE] active:scale-98 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer"
