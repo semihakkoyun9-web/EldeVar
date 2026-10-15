@@ -14,7 +14,8 @@ interface HomeBottomSectionProps {
   onSelectBrand: (brand: string) => void;
   onOpenContact?: () => void;
   onOpenFaq?: () => void;
-  onOpenLegal?: (docId: string) => void;
+  onOpenLegal?: () => void;
+  onOpenAdminPasswordModal?: () => void;
 }
 
 export const HomeBottomSection: React.FC<HomeBottomSectionProps> = ({
@@ -24,9 +25,22 @@ export const HomeBottomSection: React.FC<HomeBottomSectionProps> = ({
   onOpenContact,
   onOpenFaq,
   onOpenLegal,
+  onOpenAdminPasswordModal,
 }) => {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [adminFooterClicks, setAdminFooterClicks] = useState(0);
+
+  const handleFooterSecretClick = () => {
+    setAdminFooterClicks((prev) => {
+      const next = prev + 1;
+      if (next >= 7) {
+        onOpenAdminPasswordModal?.();
+        return 0;
+      }
+      return next;
+    });
+  };
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -262,7 +276,7 @@ export const HomeBottomSection: React.FC<HomeBottomSectionProps> = ({
               <div className="flex items-center gap-2">
                 <EldeVarSeal size={32} />
                 <span className="text-2xl font-serif font-black tracking-tight text-[#1C1917]">
-                  <span className="text-[#9E4424]">E</span>lde<span className="text-[#9E4424]">V</span>ar
+                  EldeVarmı?
                 </span>
               </div>
               <p className="text-xs text-stone-500 leading-relaxed max-w-sm">
@@ -344,7 +358,13 @@ export const HomeBottomSection: React.FC<HomeBottomSectionProps> = ({
 
             {/* Kolon 3: Kurumsal & Yardım (Kural 8: İletişim & SSS) */}
             <div className="space-y-2.5">
-              <h5 className="font-bold text-stone-900 text-xs uppercase tracking-wider">Kurumsal & Yardım</h5>
+              <h5 
+                onClick={handleFooterSecretClick}
+                className="font-bold text-stone-900 text-xs uppercase tracking-wider cursor-pointer select-none"
+                title="Kurumsal"
+              >
+                Kurumsal & Yardım
+              </h5>
               <ul className="space-y-2 text-stone-600 text-xs">
                 <li>
                   <button onClick={onOpenContact} className="hover:text-[#9E4424] flex items-center gap-1.5 cursor-pointer">
@@ -379,7 +399,7 @@ export const HomeBottomSection: React.FC<HomeBottomSectionProps> = ({
 
           {/* Alt Telif ve Yasal Bilgi (Kural 7: Yasal Sayfalar) */}
           <div className="pt-6 border-t border-[#E8E2D8] flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-stone-500 text-center sm:text-left">
-            <p>© 2026 EldeVar Teknoloji A.Ş. • WTK2105 E-Ticaret WordPress Projesi</p>
+            <p>© 2026 EldeVarMı Teknoloji A.Ş. • eldevarmi.com</p>
             <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
               <button onClick={() => onOpenLegal?.('privacy')} className="hover:underline cursor-pointer">
                 Gizlilik & KVKK

@@ -15,7 +15,7 @@ export class WordPressBridge {
   public static getSiteInfo() {
     return {
       isWordPress: this.isWordPress(),
-      siteTitle: this.settings?.siteTitle || 'EldeVar',
+      siteTitle: this.settings?.siteTitle || 'EldeVarMı',
       siteDescription: this.settings?.siteDescription || 'Eşyaların Yaşam İzi & İkinci El Pazaryeri',
       themeUrl: this.settings?.themeUrl || '',
       currentUser: this.settings?.currentUser || null,

@@ -78,8 +78,8 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
                   </div>
                   <div>
                     <strong className="block text-stone-900 font-semibold mb-0.5">E-posta</strong>
-                    <a href="mailto:destek@eldevar.com" className="text-[#9E4424] hover:underline">
-                      destek@eldevar.com
+                    <a href="mailto:destek@eldevarmi.com" className="text-[#9E4424] hover:underline">
+                      destek@eldevarmi.com
                     </a>
                   </div>
                 </div>

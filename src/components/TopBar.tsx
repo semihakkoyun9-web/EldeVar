@@ -72,7 +72,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             <EldeVarSeal size={30} />
           </div>
           <span className="text-xl font-serif font-black tracking-tight text-[#1C1917] leading-none">
-            <span className="text-[#9E4424]">E</span>lde<span className="text-[#9E4424]">V</span>ar
+            EldeVarmı?
           </span>
         </button>
 

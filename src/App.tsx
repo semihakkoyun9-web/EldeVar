@@ -28,6 +28,8 @@ import { FaqModal } from './components/FaqModal';
 import { MakeOfferModal } from './components/MakeOfferModal';
 import { MemoryBoxModal } from './components/MemoryBoxModal';
 import { AuthModal } from './components/AuthModal';
+import { AdminPasswordPromptModal } from './components/AdminPasswordPromptModal';
+import { AdminProductManagerModal } from './components/AdminProductManagerModal';
 
 import { Product, ProductCategory, CartItem, Coupon, Order, NotificationItem, UserPreferences, ProductVariation, WantedItem, WantedOffer, ProductOffer, KeepsakeItem, AuthUser, DEFAULT_AUTH_USER } from './types';
 import { INITIAL_PRODUCTS, INITIAL_ORDERS, AVAILABLE_COUPONS, STANDARD_SIZES, STANDARD_BRANDS, INITIAL_OFFERS, INITIAL_KEEPSAKES } from './data/mockData';
@@ -59,14 +61,14 @@ export default function App() {
 
   // Products Catalog (with LocalStorage)
   const [products, setProducts] = useState<Product[]>(() => {
-    const saved = getInitialStorage<Product[]>('eldevar_products_v10_perspectives', []);
+    const saved = getInitialStorage<Product[]>('eldevar_products_v12_collectibles', []);
     if (saved && saved.length > 0) {
       const userCustom = saved.filter(
         (p) => p.id.startsWith('prod-user-') || p.id.startsWith('custom-deal-')
       );
       return [...userCustom, ...INITIAL_PRODUCTS];
     }
-    const oldSaved = getInitialStorage<Product[]>('eldevar_products', []);
+    const oldSaved = getInitialStorage<Product[]>('eldevar_products_v10_perspectives', []);
     const userCustomProducts = oldSaved.filter(
       (p) => p.id.startsWith('prod-user-') || p.id.startsWith('custom-deal-')
     );
@@ -197,9 +199,13 @@ export default function App() {
     getInitialStorage('eldevar_wanted_items', INITIAL_WANTED_ITEMS)
   );
 
+  // Admin Panel Secret Access (7 clicks + Password verification)
+  const [isAdminPasswordModalOpen, setIsAdminPasswordModalOpen] = useState(false);
+  const [isAdminProductManagerOpen, setIsAdminProductManagerOpen] = useState(false);
+
   // Sync to LocalStorage
   useEffect(() => {
-    setStorage('eldevar_products_v10_perspectives', products);
+    setStorage('eldevar_products_v12_collectibles', products);
     setStorage('eldevar_products', products);
   }, [products]);
 
@@ -1126,6 +1132,7 @@ export default function App() {
               onOpenContact={() => setIsContactOpen(true)}
               onOpenFaq={() => setIsFaqOpen(true)}
               onOpenLegal={(docId) => setGlobalLegalModal(docId)}
+              onOpenAdminPasswordModal={() => setIsAdminPasswordModalOpen(true)}
             />
           </div>
         )}
@@ -1216,6 +1223,7 @@ export default function App() {
               setAuthTriggerReason('general');
               setIsAuthModalOpen(true);
             }}
+            onOpenAdminPasswordModal={() => setIsAdminPasswordModalOpen(true)}
           />
         )}
       </main>
@@ -1466,6 +1474,37 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* 13. SÜPER YÖNETİCİ ŞİFRE DOĞRULAMA MODALI (7 TIKLAMA İLE AÇILIR) */}
+      <AdminPasswordPromptModal
+        isOpen={isAdminPasswordModalOpen}
+        onClose={() => setIsAdminPasswordModalOpen(false)}
+        onSuccess={() => {
+          setIsAdminPasswordModalOpen(false);
+          setIsAdminProductManagerOpen(true);
+        }}
+      />
+
+      {/* 14. SÜPER YÖNETİCİ ÜRÜN VE GÖRSEL KONTROL PANELİ */}
+      <AdminProductManagerModal
+        isOpen={isAdminProductManagerOpen}
+        onClose={() => setIsAdminProductManagerOpen(false)}
+        products={products}
+        onSaveProducts={(newProducts) => {
+          setProducts(newProducts);
+          setNotifications((prev) => [
+            {
+              id: `notif-admin-${Date.now()}`,
+              title: '🛡️ Yönetici Güncellemesi',
+              message: 'Ürün kataloğu, fotoğraflar ve açıklamalar başarıyla güncellendi.',
+              time: 'Az önce',
+              read: false,
+              type: 'system',
+            },
+            ...prev,
+          ]);
+        }}
+      />
     </div>
   );
 }

@@ -48,7 +48,7 @@ export const CookieBanner: React.FC<CookieBannerProps> = ({ onOpenCookiePolicy }
         </div>
 
         <p className="text-xs text-stone-600 leading-relaxed font-sans">
-          EldeVar, güvenli bir alışveriş deneyimi sunmak, oturumunuzu açık tutmak ve sürdürülebilirlik etkisini analiz etmek için 6698 sayılı KVKK kapsamında çerezler kullanır.
+          EldeVarMı, güvenli bir alışveriş deneyimi sunmak, oturumunuzu açık tutmak ve sürdürülebilirlik etkisini analiz etmek için 6698 sayılı KVKK kapsamında çerezler kullanır.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center gap-2 pt-1">

@@ -28,6 +28,7 @@ interface MenuViewProps {
   onLoginSuccess?: (user: AuthUser) => void;
   onLogout?: () => void;
   onOpenAuthModal?: () => void;
+  onOpenAdminPasswordModal?: () => void;
 }
 
 export const MenuView: React.FC<MenuViewProps> = ({
@@ -50,9 +51,24 @@ export const MenuView: React.FC<MenuViewProps> = ({
   onLoginSuccess,
   onLogout,
   onOpenAuthModal,
+  onOpenAdminPasswordModal,
 }) => {
   const [activeLegalModal, setActiveLegalModal] = useState<string | null>(null);
   const [isStoreOpen, setIsStoreOpen] = useState(false);
+  
+  // Secret 7-clicks trigger for Admin Panel
+  const [adminClickCount, setAdminClickCount] = useState(0);
+
+  const handleAdminSecretClick = () => {
+    setAdminClickCount((prev) => {
+      const next = prev + 1;
+      if (next >= 7) {
+        onOpenAdminPasswordModal?.();
+        return 0;
+      }
+      return next;
+    });
+  };
 
   // Auth Form State when not logged in
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
@@ -175,7 +191,7 @@ export const MenuView: React.FC<MenuViewProps> = ({
                 EV
               </div>
               <h2 className="text-2xl font-serif font-bold text-[#1C1917]">
-                EldeVar'a Hoş Geldiniz
+                EldeVarMı'ya Hoş Geldiniz
               </h2>
               <p className="text-xs text-stone-500 mt-1 max-w-md mx-auto">
                 Kendi eşyalarınızı ilana koymak, teklif masasında pazarlık yapmak ve Eşya Hatıra Kutusu'nu saklamak için lütfen oturum açın.
@@ -661,9 +677,18 @@ export const MenuView: React.FC<MenuViewProps> = ({
 
       {/* 5. KURUMSAL VE YASAL SAYFALAR (Kural 7 ve Kural 8 Tam Uyumluluğu) */}
       <section className="bg-white rounded-2xl p-5 border border-[#E8E2D8] shadow-xs space-y-3">
-        <h3 className="font-serif font-bold text-[#1C1917] text-sm flex items-center gap-2 mb-1">
+        <h3 
+          onClick={handleAdminSecretClick}
+          className="font-serif font-bold text-[#1C1917] text-sm flex items-center gap-2 mb-1 cursor-pointer select-none active:scale-[0.99] transition-transform"
+          title="Kurumsal ve Yasal Bilgilendirme"
+        >
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
           <span>Kurumsal ve Yasal Bilgilendirme</span>
+          {adminClickCount > 2 && (
+            <span className="text-[10px] text-stone-400 font-mono ml-auto animate-pulse">
+              ({adminClickCount}/7)
+            </span>
+          )}
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -698,7 +723,7 @@ export const MenuView: React.FC<MenuViewProps> = ({
           >
             <span className="flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-amber-700" />
-              <span>Hakkımızda: EldeVar Felsefesi</span>
+              <span>Hakkımızda: EldeVarMı Felsefesi</span>
             </span>
             <ChevronRight className="w-4 h-4 text-stone-400" />
           </button>
@@ -771,7 +796,7 @@ export const MenuView: React.FC<MenuViewProps> = ({
           <div className="bg-[#FAF8F5] w-full max-w-xl rounded-2xl shadow-2xl border border-[#E4D8C4] overflow-hidden max-h-[85vh] flex flex-col animate-in fade-in">
             <div className="bg-white border-b border-[#E8E2D8] px-5 py-3.5 flex items-center justify-between">
               <span className="font-serif font-bold text-sm text-[#1C1917]">
-                {activeLegalModal === 'about' && 'EldeVar Hikâyesi & Manifesto'}
+                {activeLegalModal === 'about' && 'EldeVarMı Hikâyesi & Manifesto'}
                 {activeLegalModal === 'privacy' && 'KVKK Aydınlatma Metni'}
                 {activeLegalModal === 'cookies' && 'Çerez (Cookie) Politikası'}
                 {activeLegalModal === 'sales' && 'Mesafeli Satış Sözleşmesi'}
@@ -795,16 +820,16 @@ export const MenuView: React.FC<MenuViewProps> = ({
                     Bizde eşyalar yalnızca birer ticari meta değildir; her ceketin omzunda bir konserin, her analog vizörde bir seyahatin, her lambaderde gece yarılarının tanıklığı vardır.
                   </p>
                   <p>
-                    EldeVar, seri üretilmiş nesnelerin yerine hafızası olan eşyaları yeni sahipleriyle buluşturur. Her siparişte satıcı el yazısıyla hazırladığı hatıra kartını pakete iliştirir. Böylece satın aldığınız her ürün, hayatınıza yeni bir hikâye katar ve gezegenimize karbon tasarrufu sağlar.
+                    EldeVarMı, seri üretilmiş nesnelerin yerine hafızası olan eşyaları yeni sahipleriyle buluşturur. Her siparişte satıcı el yazısıyla hazırladığı hatıra kartını pakete iliştirir. Böylece satın aldığınız her ürün, hayatınıza yeni bir hikâye katar ve gezegenimize karbon tasarrufu sağlar.
                   </p>
                 </>
               )}
 
               {activeLegalModal === 'cookies' && (
                 <>
-                  <h4 className="font-bold text-sm text-stone-900">EldeVar Çerez (Cookie) Politikası</h4>
+                  <h4 className="font-bold text-sm text-stone-900">EldeVarMı Çerez (Cookie) Politikası</h4>
                   <p>
-                    EldeVar platformu ("Web Sitesi"), kullanıcı deneyimini iyileştirmek, sepet durumunu korumak, oturum güvenliğini sağlamak ve site trafiğini analiz etmek amacıyla çerezler (cookies) kullanmaktadır.
+                    EldeVarMı platformu ("Web Sitesi"), kullanıcı deneyimini iyileştirmek, sepet durumunu korumak, oturum güvenliğini sağlamak ve site trafiğini analiz etmek amacıyla çerezler (cookies) kullanmaktadır.
                   </p>
                   <div className="space-y-2 bg-white p-3 rounded-xl border border-stone-200">
                     <div>
@@ -828,9 +853,9 @@ export const MenuView: React.FC<MenuViewProps> = ({
 
               {activeLegalModal === 'privacy' && (
                 <>
-                  <h4 className="font-bold text-sm text-stone-900">EldeVar Gizlilik Politikası & KVKK</h4>
+                  <h4 className="font-bold text-sm text-stone-900">EldeVarMı Gizlilik Politikası & KVKK</h4>
                   <p>
-                    6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca, EldeVar C2C Pazaryeri platformu üzerinden
+                    6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca, EldeVarMı C2C Pazaryeri platformu üzerinden
                     toplanan kullanıcı verileri (Ad, Soyad, E-posta, Telefon, Teslimat Adresi) yalnızca siparişin yerine getirilmesi,
                     kargo süreçlerinin takibi ve Havale/EFT teyidi amacıyla güvenli sunucularda işlenmektedir.
                   </p>
@@ -845,10 +870,10 @@ export const MenuView: React.FC<MenuViewProps> = ({
                   <h4 className="font-bold text-sm text-stone-900">Mesafeli Satış Sözleşmesi (C2C)</h4>
                   <p>
                     İşbu sözleşme, Alıcı ile platformda ilan açan Satıcı arasında akdedilmiştir.
-                    EldeVar, 6563 sayılı Elektronik Ticaretin Düzenlenmesi Hakkında Kanun uyarınca "Aracı Hizmet Sağlayıcı" konumundadır.
+                    EldeVarMı, 6563 sayılı Elektronik Ticaretin Düzenlenmesi Hakkında Kanun uyarınca "Aracı Hizmet Sağlayıcı" konumundadır.
                   </p>
                   <p>
-                    Ödeme bedeli, Alıcı ürünü teslim alıp sistem üzerinden onay verene kadar EldeVar havuz güvence hesabında muhafaza edilir.
+                    Ödeme bedeli, Alıcı ürünü teslim alıp sistem üzerinden onay verene kadar EldeVarMı havuz güvence hesabında muhafaza edilir.
                   </p>
                 </>
               )}
@@ -868,7 +893,7 @@ export const MenuView: React.FC<MenuViewProps> = ({
                 <>
                   <h4 className="font-bold text-sm text-stone-900">Dokan Lite Pazaryeri & %10 Komisyon Modeli</h4>
                   <p>
-                    EldeVar, WordPress Dokan Lite altyapısıyla desteklenen çok satıcılı (C2C) bir ikinci el pazaryeridir.
+                    EldeVarMı, WordPress Dokan Lite altyapısıyla desteklenen çok satıcılı (C2C) bir ikinci el pazaryeridir.
                   </p>
                   <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-emerald-950 space-y-1.5">
                     <strong>Komisyon Oranı Tanımı:</strong>

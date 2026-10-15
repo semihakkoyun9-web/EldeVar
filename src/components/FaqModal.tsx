@@ -14,13 +14,13 @@ export const FaqModal: React.FC<FaqModalProps> = ({ isOpen, onClose, onOpenConta
 
   const faqs = [
     {
-      q: 'EldeVar nedir ve diğer ikinci el platformlarından farkı nedir?',
-      a: 'EldeVar, yalnızca eşyaların alınıp satıldığı bir ilan sitesi değil; her nesnenin geçmişini, hatırasını ve seyahatini yaşatan "Eşya Hafıza Pasaportu" konseptine sahip sürdürülebilir bir C2C ikinci el pazaryeridir. Her siparişte satıcı el yazısıyla bir hatıra kartı hazırlar.',
+      q: 'EldeVarMı nedir ve diğer ikinci el platformlarından farkı nedir?',
+      a: 'EldeVarMı, yalnızca eşyaların alınıp satıldığı bir ilan sitesi değil; her nesnenin geçmişini, hatırasını ve seyahatini yaşatan "Eşya Hafıza Pasaportu" konseptine sahip sürdürülebilir bir C2C ikinci el pazaryeridir. Her siparişte satıcı el yazısıyla bir hatıra kartı hazırlar.',
       category: 'Konsept',
     },
     {
-      q: 'Ödemem nasıl korunuyor? (EldeVar Güvenli Havuz Hesabı)',
-      a: 'Sipariş verdiğinizde ödemeniz doğrudan satıcıya aktarılmaz; EldeVar güvence havuzunda tutulur. Ürün kargolanıp elinize ulaştıktan sonra ilandaki kondisyonu kontrol edip onay verdiğinizde bedel satıcıya aktarılır.',
+      q: 'Ödemem nasıl korunuyor? (EldeVarMı Güvenli Havuz Hesabı)',
+      a: 'Sipariş verdiğinizde ödemeniz doğrudan satıcıya aktarılmaz; EldeVarMı güvence havuzunda tutulur. Ürün kargolanıp elinize ulaştıktan sonra ilandaki kondisyonu kontrol edip onay verdiğinizde bedel satıcıya aktarılır.',
       category: 'Güvenlik',
     },
     {
@@ -40,7 +40,7 @@ export const FaqModal: React.FC<FaqModalProps> = ({ isOpen, onClose, onOpenConta
     },
     {
       q: 'Dokan çok satıcılı altyapısı ve satıcı komisyonu nedir?',
-      a: 'EldeVar, WordPress Dokan Lite pazaryeri altyapısıyla çalışır. Her üye dilerse kendi satıcı profilini ve mağazasını açabilir. Güvenli havuz işletimi, sunucu altyapısı ve karbon azaltım fonumuz için tamamlanan satışlardan %10 platform komisyonu kesilmektedir.',
+      a: 'EldeVarMı, WordPress Dokan Lite pazaryeri altyapısıyla çalışır. Her üye dilerse kendi satıcı profilini ve mağazasını açabilir. Güvenli havuz işletimi, sunucu altyapısı ve karbon azaltım fonumuz için tamamlanan satışlardan %10 platform komisyonu kesilmektedir.',
       category: 'Satıcı & Dokan',
     },
   ];
@@ -59,7 +59,7 @@ export const FaqModal: React.FC<FaqModalProps> = ({ isOpen, onClose, onOpenConta
                 Sıkça Sorulan Sorular (S.S.S.)
               </h3>
               <p className="text-xs text-stone-500 font-sans">
-                EldeVar alışveriş ve satıcılık süreçleri hakkında merak edilenler
+                EldeVarMı alışveriş ve satıcılık süreçleri hakkında merak edilenler
               </p>
             </div>
           </div>

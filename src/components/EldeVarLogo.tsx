@@ -54,7 +54,7 @@ export const EldeVarBrand: React.FC<EldeVarBrandProps> = ({
     <div
       onClick={onClick}
       className={`shrink-0 flex items-center gap-2 select-none cursor-pointer group ${className}`}
-      title="EldeVar - Eski hikâyeler yeni sahibiyle canlanıyor"
+      title="EldeVarMı? - Eski hikâyeler yeni sahibiyle canlanıyor"
     >
       {/* Balmumu Mühür (EV) */}
       <div className="group-hover:scale-105 transition-all duration-200">
@@ -64,7 +64,7 @@ export const EldeVarBrand: React.FC<EldeVarBrandProps> = ({
       {/* Tipografi ve Slogan */}
       <div className="flex flex-col">
         <span className="text-xl sm:text-2xl font-serif font-black tracking-tight text-[#1C1917] group-hover:opacity-90 transition-opacity leading-none">
-          <span className="text-[#9E4424]">E</span>lde<span className="text-[#9E4424]">V</span>ar
+          EldeVarmı?
         </span>
         {showSlogan && (
           <span className="text-[10px] text-stone-500 font-sans tracking-tight mt-0.5">

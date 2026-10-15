@@ -119,7 +119,7 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = ({
 
           <div className="flex flex-col">
             <span className="text-2xl font-serif font-black tracking-tight text-[#1C1917] group-hover:opacity-90 transition-opacity leading-none">
-              <span className="text-[#9E4424]">E</span>lde<span className="text-[#9E4424]">V</span>ar
+              EldeVarmı?
             </span>
             <span className="text-[10px] text-stone-500 font-sans tracking-tight mt-0.5">
               Eski hikâyeler yeni sahibiyle canlanıyor
